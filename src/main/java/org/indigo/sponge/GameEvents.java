@@ -1,8 +1,6 @@
 package org.indigo.sponge;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.title.Title;
-import org.bukkit.Effect;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
@@ -10,20 +8,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.net.http.WebSocket;
 import java.util.UUID;
 
-public class GameEvents implements Listener {
+public class GameEvents extends Sponge implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-
-        if (!Sponge.gameLoaded)
+        if (!gameLoaded)
         {
             AttributeInstance att = player.getAttribute(Attribute.MOVEMENT_SPEED);
             att.setBaseValue(0);
@@ -34,7 +28,7 @@ public class GameEvents implements Listener {
                 public void run() {
                     player.showTitle(Title.title(MiniMessage.miniMessage().deserialize("<white><b>GAME LOADING"), MiniMessage.miniMessage().deserialize("<gray><i>please wait..."),0,20,5));
                     player.addPotionEffect(PotionEffectType.BLINDNESS.createEffect(-1, 1));
-                    if(Sponge.gameLoaded) {
+                    if(gameLoaded) {
                         player.showTitle(Title.title(MiniMessage.miniMessage().deserialize("<green>✔ <b>DONE <!b>✔"), MiniMessage.miniMessage().deserialize(""),2,20,5));
                         player.clearActivePotionEffects();
                         att.setBaseValue(player.getAttribute(Attribute.MOVEMENT_SPEED).getDefaultValue());
@@ -42,22 +36,23 @@ public class GameEvents implements Listener {
                         cancel();
                     }
                 }
-            }.runTaskTimer(Sponge.getPlugin(Sponge.class), 1, 1);
-            player.sendMessage("hello");
+            }.runTaskTimer(plugin, 1, 1);
         }
 
 
-        if (!Sponge.joinedPlayers.contains(player))
+        if (!joinedPlayers.contains(player))
         {
-            Sponge.joinedPlayers.add(player);
+            joinedPlayers.add(player);
             event.getPlayer().sendMessage("Created new file");
-            player.addResourcePack(UUID.randomUUID(),"https://github.com/Kr4sty/Sponge_Resourcepack/raw/refs/heads/master/Sponge.zip",null,"Download me please",true);
+            player.addResourcePack(UUID.randomUUID(),"https://github.com/Kr4sty/Sponge_Resourcepack/raw/refs/heads/master/zip",null,"Download me please",true);
             player.setCollidable(false);
             player.setAllowFlight(false);
         }
     }
     @EventHandler
     public void onSneak(PlayerToggleSneakEvent event) {
-        Sponge.gameLoaded = true;
+        Player player = event.getPlayer();
+        gameLoaded = true;
+        player.give(itemDic.get("test"));
     }
 }

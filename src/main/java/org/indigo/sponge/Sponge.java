@@ -5,6 +5,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -31,6 +32,11 @@ public class Sponge extends JavaPlugin {
         plugin = getPlugin(Sponge.class);
         spongeKey = new NamespacedKey(plugin,"sponge");
 
+        InitAll.MakeWeapons();
+        InitAll.MakeArmors();
+        InitAll.MakeAccessories();
+        InitAll.MakeConsumables();
+
     }
 //test
     @Override
@@ -47,4 +53,5 @@ public class Sponge extends JavaPlugin {
     public static boolean gameLoaded = false;
     public static List<Player> joinedPlayers = new ArrayList<>();
     public static HashMap<Player, GamePlayer> playerStates = new HashMap<>();
+    public static HashMap<String, ItemStack> itemDic = new HashMap<>();
 }
