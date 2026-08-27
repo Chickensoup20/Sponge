@@ -1,5 +1,6 @@
 package org.indigo.sponge;
 
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
@@ -8,11 +9,13 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Sponge extends JavaPlugin {
-    public static Plugin plugin = getPlugin(Sponge.class);
-    public static NamespacedKey key = new NamespacedKey(plugin,"sponge");
+    public static Plugin plugin;
+    public static NamespacedKey spongeKey;
+
     @Override
     public void onEnable() {
         // Plugin startup logic
@@ -25,6 +28,8 @@ public class Sponge extends JavaPlugin {
                 .generator(new WorldGenerator())
                 .createWorld();
         }
+        plugin = getPlugin(Sponge.class);
+        spongeKey = new NamespacedKey(plugin,"sponge");
 
     }
 //test
@@ -36,8 +41,10 @@ public class Sponge extends JavaPlugin {
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
         return new WorldGenerator();
+
     }
 
     public static boolean gameLoaded = false;
     public static List<Player> joinedPlayers = new ArrayList<>();
+    public static HashMap<Player, GamePlayer> playerStates = new HashMap<>();
 }
