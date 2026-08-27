@@ -1,8 +1,11 @@
 package org.indigo.sponge;
 
 import org.bukkit.WorldCreator;
+import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.List;
 
 public final class Sponge extends JavaPlugin {
 
@@ -12,6 +15,7 @@ public final class Sponge extends JavaPlugin {
         System.out.println("[Sponge] Plugin Enabled!");
         getServer().getPluginManager().registerEvents(new CancelledEvents(), this);
         getServer().getPluginManager().registerEvents(new ManagementEvents(), this);
+        getServer().getPluginManager().registerEvents(new GameEvents(), this);
         if(getServer().getWorld("lobby") == null) {
             new WorldCreator("lobby")
                 .generator(new WorldGenerator())
@@ -19,7 +23,7 @@ public final class Sponge extends JavaPlugin {
         }
 
     }
-
+//test
     @Override
     public void onDisable() {
         // Plugin shutdown logic
@@ -30,6 +34,5 @@ public final class Sponge extends JavaPlugin {
         return new WorldGenerator();
     }
 
-
-
+    public static List<Player> joinedPlayers;
 }

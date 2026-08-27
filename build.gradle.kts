@@ -4,16 +4,12 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
-    implementation("cloud.emilys.fibre:fibre-api:0.1.0-SNAPSHOT")
     compileOnly("io.papermc.paper:paper-api:26.2.build.+")
-
-
 }
 
 java {
@@ -29,7 +25,7 @@ tasks {
         jvmArgs("-Xms2G", "-Xmx2G")
     }
 
-    jar{
+    jar {
         destinationDirectory.set(layout.buildDirectory.dir("run/plugins"))
     }
 

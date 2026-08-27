@@ -13,7 +13,10 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityExhaustionEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class CancelledEvents implements Listener {
@@ -24,10 +27,8 @@ public class CancelledEvents implements Listener {
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onBlockPhysics(BlockPhysicsEvent event) {
-
         event.setCancelled(true);
-
-        event.getBlock().setType(event.getBlock().getType(),false);
+        event.getBlock().setBlockData(event.getBlock().getBlockData(),false);
     }
 
     @EventHandler
@@ -47,4 +48,18 @@ public class CancelledEvents implements Listener {
         }
     }
 
+    @EventHandler
+    public void onRightClick(PlayerInteractEvent event){
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onHunger(EntityExhaustionEvent event){
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onDamage(EntityDamageEvent event){
+        event.setCancelled(true);
+    }
 }

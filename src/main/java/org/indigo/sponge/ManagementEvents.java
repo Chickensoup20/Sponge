@@ -15,9 +15,9 @@ public class ManagementEvents implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        player.setGameMode(GameMode.ADVENTURE);
         player.teleport(new Location(Bukkit.getWorld("lobby"),64,67,127));
         player.getInventory().clear();
+        player.setGameMode(GameMode.ADVENTURE);
     }
 
 
