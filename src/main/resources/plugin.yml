@@ -1,0 +1,6 @@
+name: sponge
+version: '${version}'
+
+main: org.indigo.sponge.Sponge
+api-version: '26.2'
+load: POSTWORLD
