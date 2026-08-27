@@ -1,15 +1,18 @@
 package org.indigo.sponge;
 
+import org.bukkit.NamespacedKey;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public final class Sponge extends JavaPlugin {
-
+public class Sponge extends JavaPlugin {
+    public static Plugin plugin = getPlugin(Sponge.class);
+    public static NamespacedKey key = new NamespacedKey(plugin,"sponge");
     @Override
     public void onEnable() {
         // Plugin startup logic

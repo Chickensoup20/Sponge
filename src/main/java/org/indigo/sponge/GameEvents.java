@@ -37,7 +37,7 @@ public class GameEvents implements Listener {
                     if(Sponge.gameLoaded) {
                         player.showTitle(Title.title(MiniMessage.miniMessage().deserialize("<green>✔ <b>DONE <!b>✔"), MiniMessage.miniMessage().deserialize(""),2,20,5));
                         player.clearActivePotionEffects();
-                        att.setBaseValue(Attribute.MOVEMENT_SPEED.getDefaultValue());
+                        att.setBaseValue(player.getAttribute(Attribute.MOVEMENT_SPEED).getDefaultValue());
                         att2.setBaseValue(Attribute.JUMP_STRENGTH.getDefaultValue());
                         cancel();
                     }
