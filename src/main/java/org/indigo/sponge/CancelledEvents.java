@@ -20,10 +20,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class CancelledEvents implements Listener {
-    @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
-        event.joinMessage(Component.text("On my way!"));
-    }
+
 
     @EventHandler (priority = EventPriority.HIGHEST)
     public void onBlockPhysics(BlockPhysicsEvent event) {

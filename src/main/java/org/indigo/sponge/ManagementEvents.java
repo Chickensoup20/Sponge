@@ -6,11 +6,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 public class ManagementEvents implements Listener {
 
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-       GamePlayer state = new GamePlayer(event.getPlayer(), GamePlayer.State.LOBBY);
-       state.applyState();
-    }
+
 
 
 }

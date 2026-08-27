@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Objects;
 
-public class GamePlayer extends Sponge{
+public class GamePlayer{
     private final Player player;
     private State currentState;
     public enum State{
@@ -16,17 +16,18 @@ public class GamePlayer extends Sponge{
         DEV
     }
     public GamePlayer(Player player, State state){
+        player.sendMessage("1");
         currentState = state;
         this.player = player;
 
     }
 
     public void applyState(){
-        if (Objects.requireNonNull(currentState) == State.LOBBY) {
+
             player.teleport(new Location(Bukkit.getWorld("lobby"), 64, 67, 127));
             player.getInventory().clear();
             player.setGameMode(GameMode.ADVENTURE);
-        }
+            player.sendMessage("hi");
     }
 
 
@@ -37,6 +38,6 @@ public class GamePlayer extends Sponge{
 
     private void setCurrentState(State state){
         currentState = state;
-        playerStates.put(player,this);
+
     }
 }

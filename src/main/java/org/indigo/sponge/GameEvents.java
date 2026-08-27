@@ -13,11 +13,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
 
-public class GameEvents extends Sponge implements Listener {
+public class GameEvents implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        if (!gameLoaded)
+        GamePlayer gamePlayer = new GamePlayer(player, GamePlayer.State.LOBBY);
+        gamePlayer.applyState(GamePlayer.State.LOBBY);
+        if (!Sponge.gameLoaded)
         {
             AttributeInstance att = player.getAttribute(Attribute.MOVEMENT_SPEED);
             att.setBaseValue(0);
@@ -28,7 +30,7 @@ public class GameEvents extends Sponge implements Listener {
                 public void run() {
                     player.showTitle(Title.title(MiniMessage.miniMessage().deserialize("<white><b>GAME LOADING"), MiniMessage.miniMessage().deserialize("<gray><i>please wait..."),0,20,5));
                     player.addPotionEffect(PotionEffectType.BLINDNESS.createEffect(-1, 1));
-                    if(gameLoaded) {
+                    if(Sponge.gameLoaded) {
                         player.showTitle(Title.title(MiniMessage.miniMessage().deserialize("<green>✔ <b>DONE <!b>✔"), MiniMessage.miniMessage().deserialize(""),2,20,5));
                         player.clearActivePotionEffects();
                         att.setBaseValue(player.getAttribute(Attribute.MOVEMENT_SPEED).getDefaultValue());
@@ -36,15 +38,15 @@ public class GameEvents extends Sponge implements Listener {
                         cancel();
                     }
                 }
-            }.runTaskTimer(plugin, 1, 1);
+            }.runTaskTimer(Sponge.plugin, 1, 1);
         }
 
 
-        if (!joinedPlayers.contains(player))
+        if (!Sponge.joinedPlayers.contains(player))
         {
-            joinedPlayers.add(player);
+            Sponge.joinedPlayers.add(player);
             event.getPlayer().sendMessage("Created new file");
-            player.addResourcePack(UUID.randomUUID(),"https://github.com/Kr4sty/Sponge_Resourcepack/raw/refs/heads/master/zip",null,"Download me please",true);
+            player.addResourcePack(UUID.randomUUID(),"https://github.com/Kr4sty/Sponge_Resourcepack/raw/refs/heads/master/Sponge.zip",null,"Download me please",true);
             player.setCollidable(false);
             player.setAllowFlight(false);
         }
@@ -52,7 +54,7 @@ public class GameEvents extends Sponge implements Listener {
     @EventHandler
     public void onSneak(PlayerToggleSneakEvent event) {
         Player player = event.getPlayer();
-        gameLoaded = true;
-        player.give(itemDic.get("test"));
+        Sponge.gameLoaded = true;
+        player.give(Sponge.itemDic.get("test"));
     }
 }
