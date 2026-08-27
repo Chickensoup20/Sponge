@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public final class Sponge extends JavaPlugin {
@@ -34,5 +35,6 @@ public final class Sponge extends JavaPlugin {
         return new WorldGenerator();
     }
 
-    public static List<Player> joinedPlayers;
+    public static boolean gameLoaded = false;
+    public static List<Player> joinedPlayers = new ArrayList<>();
 }
