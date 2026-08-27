@@ -1,6 +1,6 @@
 package org.indigo.sponge;
 
-import org.bukkit.Bukkit;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.NamespacedKey;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
@@ -19,6 +19,11 @@ public class Sponge extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        //Initialising commands
+        this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
+            commands.registrar().register(CommandHelper.flyspeedCommand().build());
+        });
+
         // Plugin startup logic
         System.out.println("[Sponge] Plugin Enabled!");
         getServer().getPluginManager().registerEvents(new CancelledEvents(), this);
@@ -31,6 +36,8 @@ public class Sponge extends JavaPlugin {
         }
         plugin = getPlugin(Sponge.class);
         spongeKey = new NamespacedKey(plugin,"sponge");
+
+
 
         InitAll.MakeWeapons();
         InitAll.MakeArmors();
@@ -52,6 +59,6 @@ public class Sponge extends JavaPlugin {
 
     public static boolean gameLoaded = false;
     public static List<Player> joinedPlayers = new ArrayList<>();
-    public static HashMap<Player, GamePlayer> playerStates = new HashMap<>();
+    public static HashMap<Player, SpongePlayer> playerStates = new HashMap<>();
     public static HashMap<String, ItemStack> itemDic = new HashMap<>();
 }

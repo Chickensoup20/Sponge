@@ -17,8 +17,8 @@ public class GameEvents implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        GamePlayer gamePlayer = new GamePlayer(player, GamePlayer.State.LOBBY);
-        gamePlayer.applyState(GamePlayer.State.LOBBY);
+        SpongePlayer spongePlayer = new SpongePlayer(player, SpongePlayer.State.LOBBY);
+        spongePlayer.applyState(SpongePlayer.State.LOBBY);
         if (!Sponge.gameLoaded)
         {
             AttributeInstance att = player.getAttribute(Attribute.MOVEMENT_SPEED);
@@ -33,7 +33,7 @@ public class GameEvents implements Listener {
                     if(Sponge.gameLoaded) {
                         player.showTitle(Title.title(MiniMessage.miniMessage().deserialize("<green>✔ <b>DONE <!b>✔"), MiniMessage.miniMessage().deserialize(""),2,20,5));
                         player.clearActivePotionEffects();
-                        att.setBaseValue(player.getAttribute(Attribute.MOVEMENT_SPEED).getDefaultValue());
+                        att.setBaseValue(0.1);
                         att2.setBaseValue(Attribute.JUMP_STRENGTH.getDefaultValue());
                         cancel();
                     }
