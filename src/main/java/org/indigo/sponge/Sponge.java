@@ -1,6 +1,7 @@
 package org.indigo.sponge;
 
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
@@ -37,12 +38,10 @@ public class Sponge extends JavaPlugin {
         plugin = getPlugin(Sponge.class);
         spongeKey = new NamespacedKey(plugin,"sponge");
 
-
-
-        InitAll.MakeWeapons();
-        InitAll.MakeArmors();
-        InitAll.MakeAccessories();
-        InitAll.MakeConsumables();
+        InitAll.makeWeapons();
+        InitAll.makeArmors();
+        InitAll.makeAccessories();
+        InitAll.makeConsumables();
 
     }
 //test
@@ -60,5 +59,11 @@ public class Sponge extends JavaPlugin {
     public static boolean gameLoaded = false;
     public static List<Player> joinedPlayers = new ArrayList<>();
     public static HashMap<Player, SpongePlayer> playerStates = new HashMap<>();
-    public static HashMap<String, ItemStack> itemDic = new HashMap<>();
+
+
+    //Item Dictionaries (item id, value)
+    public static HashMap<String, ItemStack> itemDic = new HashMap<>(); // Contains all items in the game
+    public static HashMap<String, ItemStack> floorAllItems = new HashMap<>(); // Contains only items for all floors
+
+    public static HashMap<String, HashMap<String, Double>> itemStatDic = new HashMap<>(); // Contains additional item stats
 }
