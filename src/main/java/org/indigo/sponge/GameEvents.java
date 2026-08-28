@@ -3,11 +3,15 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.title.Title;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -58,6 +62,15 @@ public class GameEvents implements Listener {
             Sponge.gameLoaded = true;
             player.give(Sponge.itemDic.get("test"));
             player.give(Sponge.itemDic.get("trainingSword"));
+            player.give(Sponge.itemDic.get("leatherHelmet"));
+            player.give(Sponge.itemDic.get("razorBlade"));
+            player.give(Sponge.itemDic.get("chickenLeg"));
         }
+    }
+
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent event)
+    {
+
     }
 }
