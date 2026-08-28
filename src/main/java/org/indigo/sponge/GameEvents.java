@@ -19,43 +19,45 @@ public class GameEvents implements Listener {
         Player player = event.getPlayer();
         SpongePlayer spongePlayer = new SpongePlayer(player, SpongePlayer.State.LOBBY);
         spongePlayer.applyState(SpongePlayer.State.LOBBY);
-        if (!Sponge.gameLoaded)
-        {
-            AttributeInstance att = player.getAttribute(Attribute.MOVEMENT_SPEED);
-            att.setBaseValue(0);
-            AttributeInstance att2 = player.getAttribute(Attribute.JUMP_STRENGTH);
-            att2.setBaseValue(0);
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    player.showTitle(Title.title(MiniMessage.miniMessage().deserialize("<white><b>GAME LOADING"), MiniMessage.miniMessage().deserialize("<gray><i>please wait..."),0,20,5));
-                    player.addPotionEffect(PotionEffectType.BLINDNESS.createEffect(-1, 1));
-                    if(Sponge.gameLoaded) {
-                        player.showTitle(Title.title(MiniMessage.miniMessage().deserialize("<green>✔ <b>DONE <!b>✔"), MiniMessage.miniMessage().deserialize(""),2,20,5));
-                        player.clearActivePotionEffects();
-                        att.setBaseValue(0.1);
-                        att2.setBaseValue(Attribute.JUMP_STRENGTH.getDefaultValue());
-                        cancel();
-                    }
-                }
-            }.runTaskTimer(Sponge.plugin, 1, 1);
-        }
+//        if (!Sponge.gameLoaded)
+//        {
+//            AttributeInstance att = player.getAttribute(Attribute.MOVEMENT_SPEED);
+//            att.setBaseValue(0);
+//            AttributeInstance att2 = player.getAttribute(Attribute.JUMP_STRENGTH);
+//            att2.setBaseValue(0);
+//            new BukkitRunnable() {
+//                @Override
+//                public void run() {
+//                    player.showTitle(Title.title(MiniMessage.miniMessage().deserialize("<white><b>GAME LOADING"), MiniMessage.miniMessage().deserialize("<gray><i>please wait..."),0,20,5));
+//                    player.addPotionEffect(PotionEffectType.BLINDNESS.createEffect(-1, 1));
+//                    if(Sponge.gameLoaded) {
+//                        player.showTitle(Title.title(MiniMessage.miniMessage().deserialize("<green>✔ <b>DONE <!b>✔"), MiniMessage.miniMessage().deserialize(""),2,20,5));
+//                        player.clearActivePotionEffects();
+//                        att.setBaseValue(0.1);
+//                        att2.setBaseValue(Attribute.JUMP_STRENGTH.getDefaultValue());
+//                        cancel();
+//                    }
+//                }
+//            }.runTaskTimer(Sponge.plugin, 1, 1);
+//        }
+        Sponge.gameLoaded = true;
 
+        player.addResourcePack(UUID.randomUUID(),"https://github.com/Kr4sty/Sponge_Resourcepack/raw/refs/heads/master/Sponge.zip",null,"Download me please",true);
 
         if (!Sponge.joinedPlayers.contains(player))
         {
             Sponge.joinedPlayers.add(player);
-            event.getPlayer().sendMessage("Created new file");
-            player.addResourcePack(UUID.randomUUID(),"https://github.com/Kr4sty/Sponge_Resourcepack/raw/refs/heads/master/Sponge.zip",null,"Download me please",true);
             player.setCollidable(false);
             player.setAllowFlight(false);
         }
     }
     @EventHandler
     public void onSneak(PlayerToggleSneakEvent event) {
-        Player player = event.getPlayer();
-        Sponge.gameLoaded = true;
-        player.give(Sponge.itemDic.get("test"));
-        player.give(Sponge.itemDic.get("trainingSword"));
+        if(Sponge.playerStates.get(event.getPlayer()).getState() == SpongePlayer.State.LOBBY) {
+            Player player = event.getPlayer();
+            Sponge.gameLoaded = true;
+            player.give(Sponge.itemDic.get("test"));
+            player.give(Sponge.itemDic.get("trainingSword"));
+        }
     }
 }

@@ -4,12 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54729091-7843-47d5-9acf-d5dce8829433" name="Changes" comment="fix: plugin not loading">
+    <list default="true" id="54729091-7843-47d5-9acf-d5dce8829433" name="Changes" comment="feat: a lil of this, a lil of that">
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/indigo/sponge/Colors.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/indigo/sponge/CancelledEvents.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/indigo/sponge/CancelledEvents.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/indigo/sponge/CommandHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/indigo/sponge/CommandHelper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/indigo/sponge/GameEvents.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/indigo/sponge/GameEvents.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/indigo/sponge/GamePlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/indigo/sponge/GamePlayer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/indigo/sponge/ManagementEvents.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/indigo/sponge/ManagementEvents.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/indigo/sponge/ManagementEvents.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/indigo/sponge/Sponge.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/indigo/sponge/Sponge.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/indigo/sponge/SpongePlayer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/indigo/sponge/SpongePlayer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,7 +20,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="352" />
+    <option name="cachedIndexableFilesCount" value="411" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="ExternalProjectsData">
@@ -90,61 +93,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.449630980646239E-60" />
-      <entry key="MS500" value="1.0770887564409641E-12" />
-      <entry key="S2" value="0.0010187388608690023" />
-      <entry key="S5" value="0.06356603888598672" />
-      <entry key="S10" value="0.25212306297968173" />
-      <entry key="S30" value="0.631825924546428" />
-      <entry key="S60" value="0.8096102475305665" />
-      <entry key="M2" value="1.1826279958056332" />
-      <entry key="M5" value="3.5857169418221013" />
-      <entry key="M10" value="8.206506480039195" />
-      <entry key="M15" value="12.881813515670427" />
-      <entry key="M30" value="27.829423497898645" />
-      <entry key="H1" value="54.964064354713614" />
-      <entry key="H2" value="90.0846783365302" />
-      <entry key="H4" value="121.67176466791229" />
-      <entry key="D1" value="161.11567047942182" />
-      <entry key="W1" value="169.5399431681798" />
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="1.4016138689643734E-263" />
+      <entry key="S2" value="1.943757315720475E-66" />
+      <entry key="S5" value="6.0646843991297164E-27" />
+      <entry key="S10" value="1.1482899170908108E-13" />
+      <entry key="S30" value="1.1546121280287176E-4" />
+      <entry key="S60" value="0.024299869242300952" />
+      <entry key="M2" value="0.381435712914106" />
+      <entry key="M5" value="2.6242303834311187" />
+      <entry key="M10" value="7.359369609951314" />
+      <entry key="M15" value="12.284441981587666" />
+      <entry key="M30" value="27.067463328760347" />
+      <entry key="H1" value="55.882737046379354" />
+      <entry key="H2" value="105.93033770139982" />
+      <entry key="H4" value="171.406375959616" />
+      <entry key="D1" value="289.26382222661215" />
+      <entry key="W1" value="320.37993791691383" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="1.0000128313790797" />
-      <entry key="MS500" value="1.117716851772066" />
-      <entry key="S2" value="1.9451086100232577" />
-      <entry key="S5" value="2.990969261887035" />
-      <entry key="S10" value="4.252016299305492" />
-      <entry key="S30" value="6.238299493804936" />
-      <entry key="S60" value="7.20803093546144" />
-      <entry key="M2" value="8.929598101311381" />
-      <entry key="M5" value="14.799515966675814" />
-      <entry key="M10" value="23.07788817773968" />
-      <entry key="M15" value="30.215584323888553" />
-      <entry key="M30" value="48.97471234657618" />
-      <entry key="H1" value="77.40631267775993" />
-      <entry key="H2" value="110.00281557865829" />
-      <entry key="H4" value="137.35292697165917" />
-      <entry key="D1" value="170.00533644271601" />
-      <entry key="W1" value="176.82307504465217" />
+      <entry key="MS100" value="1.0" />
+      <entry key="MS500" value="1.0" />
+      <entry key="S2" value="1.0000059239873886" />
+      <entry key="S5" value="1.0081104630511177" />
+      <entry key="S10" value="1.0900581093027872" />
+      <entry key="S30" value="1.4484664013547168" />
+      <entry key="S60" value="1.7121898973571428" />
+      <entry key="M2" value="2.458465249509726" />
+      <entry key="M5" value="5.925708000976887" />
+      <entry key="M10" value="13.113465660618173" />
+      <entry key="M15" value="20.90362776538053" />
+      <entry key="M30" value="41.660028429768076" />
+      <entry key="H1" value="75.15752346132747" />
+      <entry key="H2" value="128.91742578985122" />
+      <entry key="H4" value="196.13300535644646" />
+      <entry key="D1" value="311.86321058542984" />
+      <entry key="W1" value="341.6476341126955" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.00280069521876422" />
-      <entry key="MS500" value="0.33008305871159155" />
-      <entry key="S2" value="1.3850180563750023" />
-      <entry key="S5" value="2.6175395694455275" />
-      <entry key="S10" value="4.139624262039279" />
-      <entry key="S30" value="6.6672169146873586" />
-      <entry key="S60" value="7.896586463997234" />
-      <entry key="M2" value="10.035340608940293" />
-      <entry key="M5" value="18.32823769392408" />
-      <entry key="M10" value="31.229401907896822" />
-      <entry key="M15" value="43.03948165090443" />
-      <entry key="M30" value="76.73737204179973" />
-      <entry key="H1" value="132.30159460027136" />
-      <entry key="H2" value="200.031201155492" />
-      <entry key="H4" value="258.987195556011" />
-      <entry key="D1" value="331.11289457817685" />
-      <entry key="W1" value="346.3618038392787" />
+      <entry key="MS100" value="1.7834137292688355E-104" />
+      <entry key="MS500" value="2.329428946222694E-21" />
+      <entry key="S2" value="1.1339066763148642E-5" />
+      <entry key="S5" value="0.015897824956373013" />
+      <entry key="S10" value="0.17823697612612843" />
+      <entry key="S30" value="0.8935771796331953" />
+      <entry key="S60" value="1.400407141740528" />
+      <entry key="M2" value="2.6317278003531124" />
+      <entry key="M5" value="8.41546631855246" />
+      <entry key="M10" value="20.36993652476759" />
+      <entry key="M15" value="33.098134335284676" />
+      <entry key="M30" value="68.65582068927452" />
+      <entry key="H1" value="130.98257943644376" />
+      <entry key="H2" value="234.79814411307242" />
+      <entry key="H4" value="367.49925495287783" />
+      <entry key="D1" value="601.1154447320107" />
+      <entry key="W1" value="662.025727774222" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -274,7 +277,9 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="feat: PlayerState" />
     <MESSAGE value="fix: plugin not loading" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: plugin not loading" />
+    <MESSAGE value="fix: GamePlayer being weird asl" />
+    <MESSAGE value="feat: a lil of this, a lil of that" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: a lil of this, a lil of that" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

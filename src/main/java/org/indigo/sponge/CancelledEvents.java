@@ -47,7 +47,8 @@ public class CancelledEvents implements Listener {
 
     @EventHandler
     public void onRightClick(PlayerInteractEvent event){
-        event.setCancelled(true);
+        if(Sponge.playerStates.get(event.getPlayer()).getState() == SpongePlayer.State.LOBBY)
+            event.setCancelled(true);
     }
 
     @EventHandler

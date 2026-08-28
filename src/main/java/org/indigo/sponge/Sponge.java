@@ -1,6 +1,7 @@
 package org.indigo.sponge;
 
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.WorldCreator;
@@ -17,18 +18,19 @@ import java.util.List;
 public class Sponge extends JavaPlugin {
     public static Plugin plugin;
     public static NamespacedKey spongeKey;
-
+    public static MiniMessage mm = MiniMessage.miniMessage();
     @Override
     public void onEnable() {
         //Initialising commands
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
-            commands.registrar().register(CommandHelper.flyspeedCommand().build());
+            commands.registrar().register(CommandHelper.flyspeedCommand().build(),List.of("fs","flightspeed"));
+            commands.registrar().register(CommandHelper.devCommand());
+            commands.registrar().register(CommandHelper.lobbyCommand());
         });
 
         // Plugin startup logic
         System.out.println("[Sponge] Plugin Enabled!");
         getServer().getPluginManager().registerEvents(new CancelledEvents(), this);
-        getServer().getPluginManager().registerEvents(new ManagementEvents(), this);
         getServer().getPluginManager().registerEvents(new GameEvents(), this);
         if(getServer().getWorld("lobby") == null) {
             new WorldCreator("lobby")
