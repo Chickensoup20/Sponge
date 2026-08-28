@@ -1,17 +1,16 @@
 package org.indigo.sponge.functions;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.util.HSVLike;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.indigo.sponge.Sponge;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Utils {
 
@@ -36,7 +35,7 @@ public class Utils {
         Sponge.itemStatDic.put(id, allStats);
     }
 
-    public static String translateStats(String type, String stat, String value)
+    public static String translateStats(String type, String stat, Object value)
     {
         List<String> stats = List.of("dmg", "health", "armor", "speed", "resistance", "evasion", "ether", "atk_speed", "max_ammo", "range", "crit_chance", "heal", "regeneration", "incEther", "money", "fire", "poison", "electric");
         List<String> colors = List.of("<#FF2828>[V] #14", "<#AA3131>[V] #04", "<#C9D8F9>[V]% #05", "<#5353F9>[V] #06", "<#5ECBE1>[V]% #07", "<#FFFFFF>[V]% #08", "<#BB80ED>[V] #09", "<#26de69>[V] #10", "<#FF8132>[V] #11", "<#FFEE6D>[V] #16", "<#FFD5A5>[V]% #20", "<#70FF5B>[V] #15", "<#70FF5B>[V]/s #15", "<#BB80ED>[V] #09", "<#FFC635>[V] #19", "<#FF6E14>[V]/s #17", "<#4B9940>[V]/s #18", "<#D0FFEA>[V]/s #21");
@@ -57,9 +56,64 @@ public class Utils {
         }
         else
         {
-            finalColor = finalColor.replace("[V]", value);
+            finalColor = finalColor.replace("[V]", value.toString());
         }
         return finalColor;
+    }
+    public static List<Component> translateLore(String lore, String txtColor, Integer offset)
+    {
+        List<String> symbols = List.of("<font:lore_icons>a", "<font:lore_icons>b", "<font:lore_icons>c", "<font:lore_icons>d", "<font:lore_icons>e", "<font:lore_icons>f", "<font:lore_icons>g", "<font:lore_icons>h", "<font:lore_icons>i", "<font:lore_icons>j", "<font:lore_icons>k", "<font:lore_icons>l", "<font:lore_icons>m", "<font:lore_icons>n", "<font:lore_icons>o", "<font:lore_icons>p", "<font:lore_icons>q", "<font:lore_icons>r", "<font:lore_icons>s", "<font:lore_icons>t", "<font:lore_icons>u");
+        String[] loreList = lore.split("");
+        String newLore = "";
+        int ind = 0;
+        for (String currChar:loreList)
+        {
+            ind++;
+            if (ind >= 40)
+            {
+                if (currChar.equalsIgnoreCase("\\"))
+                {
+                    ind = 0;
+                }
+                if (currChar.equalsIgnoreCase(" "))
+                {
+                    currChar = "\\";
+                    ind = 0;
+                }
+                newLore = newLore + currChar;
+            }
+
+        }
+        String[] newLoreList = newLore.split("\\\\");
+        List<Component> retVar = new ArrayList<>();
+        for (String line:newLoreList)
+        {
+            String[] lineList = line.split(" ");
+            ind = 1;
+            String finalLine = "";
+            for (String word:lineList)
+            {
+                if (word.startsWith("#")) {
+                    int hashInd = word.indexOf("#", 1);
+                    int startInd = hashInd + 1;
+                    int endInd = hashInd + 2;
+                    word = word.substring(startInd, endInd);
+                    int symbolInd = Integer.parseInt(word);
+                    String symbol = symbols.get(symbolInd);
+                    finalLine = finalLine + "<reset>" + symbol + "<reset>";
+                }
+                else
+                {
+                    finalLine = finalLine + txtColor + word;
+                }
+                ind++;
+            }
+            for (int i = 0; i < offset; i++) {
+                finalLine = " " + finalLine;
+            }
+            retVar.add(MiniMessage.miniMessage().deserialize(finalLine));
+        }
+        return retVar;
     }
 
 }

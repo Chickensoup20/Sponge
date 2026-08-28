@@ -56,5 +56,6 @@ public class GameEvents implements Listener {
         Player player = event.getPlayer();
         Sponge.gameLoaded = true;
         player.give(Sponge.itemDic.get("test"));
+        player.give(Sponge.itemDic.get("trainingSword"));
     }
 }
