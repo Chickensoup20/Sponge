@@ -23,7 +23,7 @@ public class InitAll {
 
     public static void makeAccessories()
     {
-        Utils.createStatDic("razorBlade", "inc", List.of("dmg", "crit_chance"), List.of(1.5, 4.0));
+        Utils.createStatDic("razorBlade", "inc", List.of("damage", "crit_chance"), List.of(1.5, 4.0));
         Item.createAccessory("razorBlade", new ItemStack(Material.LIGHT_BLUE_DYE, 1), "Razor Blade", "Very sharp, gives crit chance", 10.0, 0);
     }
 

@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class Item {
 
-    public static void createWeapon(String id, ItemStack item, String name, String desc, Double value, String subCategory, String abilityId, Integer floorlevel, Double dmg, Double atkSpeed, Double additionalStat ) {
+    public static void createWeapon(String id, ItemStack item, String name, String desc, Double value, String subCategory, String abilityId, Integer floorlevel, Double damage, Double attack_speed, Double additionalStat ) {
         String category = "weapon-" + subCategory;
         subCategory = Utils.toProperCase(subCategory);
         ItemMeta meta = item.getItemMeta();
@@ -27,15 +27,15 @@ public class Item {
         List<Component> loreLineList;
         String loreColor = "";
 
-        meta.getPersistentDataContainer().set(new NamespacedKey(Sponge.plugin, "dmg"), PersistentDataType.DOUBLE, dmg);
-        String dmgStr = Utils.translateStats("set", "dmg", dmg);
-        loreLineList = Utils.translateLore("Damage: " + dmgStr, "<gray>", 1);
+        meta.getPersistentDataContainer().set(new NamespacedKey(Sponge.plugin, "damage"), PersistentDataType.DOUBLE, damage);
+        String damageStr = Utils.translateStats("inc", "damage", damage);
+        loreLineList = Utils.translateLore("Damage: " + damageStr, "<gray>", 1);
         loreList.addAll(loreLineList);
         loreLineList.clear();
 
-        meta.getPersistentDataContainer().set(new NamespacedKey(Sponge.plugin, "atkSpeed"), PersistentDataType.DOUBLE, atkSpeed);
-        String atkSpeedStr = Utils.translateStats("set", "atk_speed", atkSpeed);
-        loreLineList = Utils.translateLore("Atk. Speed: " + atkSpeedStr, "<gray>", 1);
+        meta.getPersistentDataContainer().set(new NamespacedKey(Sponge.plugin, "attack_speed"), PersistentDataType.DOUBLE, attack_speed);
+        String atkSpeedStr = Utils.translateStats("inc", "attack_speed", attack_speed);
+        loreLineList = Utils.translateLore("Attack Speed: " + atkSpeedStr, "<gray>", 1);
         loreList.addAll(loreLineList);
         loreLineList.clear();
 
@@ -68,7 +68,6 @@ public class Item {
         }
         if (Sponge.itemStatDic.containsKey(id))
         {
-            loreList.add(Component.text(""));
             HashMap<String,Double> itemStats =  Sponge.itemStatDic.get(id);
             for (Map.Entry<String, Double> entry : itemStats.entrySet()) {
                 String stat = entry.getKey();
@@ -82,7 +81,7 @@ public class Item {
         }
 
         loreList.add(Component.text(""));
-        loreList.add(MiniMessage.miniMessage().deserialize("   <gradient:dark_gray:" + loreColor + "><st>                <!st>⏴<reset> <" + loreColor + ">ᴅᴇsᴄʀɪᴘᴛɪᴏɴ <gradient:" + loreColor + ":dark_gray>⏵<st>                <!st>"));
+        loreList.add(MiniMessage.miniMessage().deserialize("<!i>   <gradient:dark_gray:" + loreColor + "><st>                <!st>⏴<reset><!i> <" + loreColor + ">ᴅᴇsᴄʀɪᴘᴛɪᴏɴ <gradient:" + loreColor + ":dark_gray>⏵<st>                <!st>"));
         List<Component>  descList = Utils.translateLore(desc, "<gray>", 1);
         loreList.addAll(descList);
 
@@ -111,7 +110,7 @@ public class Item {
         String loreColor = "";
 
         meta.getPersistentDataContainer().set(new NamespacedKey(Sponge.plugin, "armor"), PersistentDataType.DOUBLE, armor);
-        String armorStr = Utils.translateStats("set", "armor", armor);
+        String armorStr = Utils.translateStats("inc", "armor", armor);
         loreLineList = Utils.translateLore("Armor: " + armorStr, "<gray>", 1);
         loreList.addAll(loreLineList);
         loreLineList.clear();
@@ -136,7 +135,6 @@ public class Item {
         }
         if (Sponge.itemStatDic.containsKey(id))
         {
-            loreList.add(Component.text(""));
             HashMap<String,Double> itemStats =  Sponge.itemStatDic.get(id);
             for (Map.Entry<String, Double> entry : itemStats.entrySet()) {
                 String stat = entry.getKey();
@@ -150,7 +148,7 @@ public class Item {
         }
 
         loreList.add(Component.text(""));
-        loreList.add(MiniMessage.miniMessage().deserialize("   <gradient:dark_gray:" + loreColor + "><st>                <!st>⏴<reset> <" + loreColor + ">ᴅᴇsᴄʀɪᴘᴛɪᴏɴ <gradient:" + loreColor + ":dark_gray>⏵<st>                <!st>"));
+        loreList.add(MiniMessage.miniMessage().deserialize("<!i>   <gradient:dark_gray:" + loreColor + "><st>                <!st>⏴<reset><!i> <" + loreColor + ">ᴅᴇsᴄʀɪᴘᴛɪᴏɴ <gradient:" + loreColor + ":dark_gray>⏵<st>                <!st>"));
         List<Component>  descList = Utils.translateLore(desc, "<gray>", 1);
         loreList.addAll(descList);
 
@@ -192,7 +190,7 @@ public class Item {
         }
 
         loreList.add(Component.text(""));
-        loreList.add(MiniMessage.miniMessage().deserialize("   <gradient:dark_gray:#54FCFC><st>                <!st>⏴<reset> <#54FCFC>ᴅᴇsᴄʀɪᴘᴛɪᴏɴ <gradient:#54FCFC:dark_gray>⏵<st>                <!st>"));
+        loreList.add(MiniMessage.miniMessage().deserialize("<!i>   <gradient:dark_gray:#54FCFC><st>                <!st>⏴<reset><!i> <#54FCFC>ᴅᴇsᴄʀɪᴘᴛɪᴏɴ <gradient:#54FCFC:dark_gray>⏵<st>                <!st>"));
         List<Component>  descList = Utils.translateLore(desc, "<gray>", 1);
         loreList.addAll(descList);
 
@@ -242,7 +240,7 @@ public class Item {
         }
 
         loreList.add(Component.text(""));
-        loreList.add(MiniMessage.miniMessage().deserialize("   <gradient:dark_gray:#FC5454><st>                <!st>⏴<reset> <#FC5454>ᴅᴇsᴄʀɪᴘᴛɪᴏɴ <gradient:#FC5454:dark_gray>⏵<st>                <!st>"));
+        loreList.add(MiniMessage.miniMessage().deserialize("<!i>   <gradient:dark_gray:#FC5454><st>                <!st>⏴<reset><!i> <#FC5454>ᴅᴇsᴄʀɪᴘᴛɪᴏɴ <gradient:#FC5454:dark_gray>⏵<st>                <!st>"));
         List<Component> descList = Utils.translateLore(desc, "<gray>", 1);
         loreList.addAll(descList);
 

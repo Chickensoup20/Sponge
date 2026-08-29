@@ -54,13 +54,15 @@ public class Utils {
 
     public static String translateStats(String type, String stat, Object value)
     {
-        List<String> stats = List.of("dmg", "health", "armor", "speed", "resistance", "evasion", "ether", "atk_speed", "max_ammo", "range", "crit_chance", "heal", "regeneration", "incEther", "money", "fire", "poison", "electric");
+        List<String> stats = List.of("damage", "health", "armor", "speed", "resistance", "evasion", "ether", "attack_speed", "max_ammo", "range", "crit_chance", "heal", "regeneration", "incEther", "money", "fire", "poison", "electric");
         List<String> colors = List.of("<#FF2828>[V] #14", "<#AA3131>[V] #04", "<#C9D8F9>[V%] #05", "<#5353F9>[V] #06", "<#5ECBE1>[V%] #07", "<#FFFFFF>[V%] #08", "<#BB80ED>[V] #09", "<#26de69>[V] #10", "<#FF8132>[V] #11", "<#FFEE6D>[V] #16", "<#FFD5A5>[V%] #20", "<#70FF5B>[V] #15", "<#70FF5B>[V/s] #15", "<#BB80ED>[V] #09", "<#FFC635>[V] #19", "<#FF6E14>[V/s] #17", "<#4B9940>[V/s] #18", "<#D0FFEA>[V/s] #21");
         HashMap<String, String> allStats = new HashMap<>();
         int size = Math.min(stats.size(), colors.size());
         for (int i = 0; i < size; i++) {
             allStats.put(stats.get(i), colors.get(i));
         }
+
+        String valueStr =  value.toString().replaceAll("\\.0(?!\\d)", "");
 
         String finalColor = allStats.get(stat);
         String target = "[V]";
@@ -77,15 +79,15 @@ public class Utils {
         }
         if (type.equalsIgnoreCase("inc"))
         {
-            finalColor = finalColor.replace(target, "+" + value + result);
+            finalColor = finalColor.replace(target, "+" + valueStr + result);
         }
         else if (type.equalsIgnoreCase("dec"))
         {
-            finalColor = finalColor.replace(target, "-" + value + result);
+            finalColor = finalColor.replace(target, "-" + valueStr + result);
         }
         else
         {
-            finalColor = finalColor.replace(target, value.toString()  + result);
+            finalColor = finalColor.replace(target, valueStr + result);
         }
         return finalColor;
     }
