@@ -25,6 +25,7 @@ public class Sponge extends JavaPlugin {
             commands.registrar().register(CommandHelper.flyspeedCommand().build(),List.of("fs","flightspeed"));
             commands.registrar().register(CommandHelper.devCommand());
             commands.registrar().register(CommandHelper.lobbyCommand());
+            commands.registrar().register(CommandHelper.giveCommand(),List.of("give","get"));
         });
 
         // Plugin startup logic

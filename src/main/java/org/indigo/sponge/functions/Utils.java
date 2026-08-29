@@ -3,14 +3,18 @@ package org.indigo.sponge.functions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.indigo.sponge.Colors;
 import org.indigo.sponge.Sponge;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static org.indigo.sponge.Sponge.mm;
 
 public class Utils {
 
@@ -139,5 +143,8 @@ public class Utils {
             retVar.add(MiniMessage.miniMessage().deserialize(finalLine));
         }
         return retVar;
+    }
+    public static void sendSystemMessage(Player player, String string){
+        player.sendMessage(mm.deserialize(Colors.spongeLogo + Colors.toMM(Colors.GOLD_LIGHT) + " " + string));
     }
 }
