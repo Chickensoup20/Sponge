@@ -7,6 +7,7 @@ repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://maven.enginehub.org/repo/")
+    maven("https://repo.infernalsuite.com/repository/maven-snapshots/")
 }
 
 dependencies {
@@ -14,6 +15,8 @@ dependencies {
     implementation(platform("com.intellectualsites.bom:bom-newest:1.56")) // Ref: https://github.com/IntellectualSites/bom
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") { isTransitive = false }
+    compileOnly("com.infernalsuite.asp:api:4.0.0-SNAPSHOT")
+    implementation("com.infernalsuite.asp:file-loader:4.0.0-SNAPSHOT")
 }
 
 java {
