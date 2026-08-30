@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.indigo.sponge.rooms.Room;
+import org.indigo.sponge.rooms.RoomEvents;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,6 +53,7 @@ public class Sponge extends JavaPlugin {
         System.out.println("[Sponge] Plugin Enabled!");
         getServer().getPluginManager().registerEvents(new CancelledEvents(), this);
         getServer().getPluginManager().registerEvents(new GameEvents(), this);
+        getServer().getPluginManager().registerEvents(new RoomEvents(), this);
         if(getServer().getWorld("lobby") == null) {
             new WorldCreator("lobby")
                 .generator(new WorldGenerator())

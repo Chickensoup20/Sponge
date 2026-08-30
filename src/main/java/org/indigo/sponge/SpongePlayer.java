@@ -3,25 +3,32 @@ package org.indigo.sponge;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
+import org.indigo.sponge.rooms.Room;
 
 public class SpongePlayer {
     private final Player player;
     private State currentState;
+    private Room buildingRoom;
 
     public enum State {
         LOBBY,
         INGAME,
-        DEV
+        DEV,
+        BUILD
     }
 
     public SpongePlayer(Player player, State state) {
         player.sendMessage("1");
         currentState = state;
         this.player = player;
+        buildingRoom = null;
         Sponge.playerStates.put(player,this);
     }
+
+
 
     public void applyState() {
         Location teleportLoc;
@@ -32,7 +39,12 @@ public class SpongePlayer {
             }
             case LOBBY -> {
                 player.setGameMode(GameMode.ADVENTURE);
+                buildingRoom = null;
                 break;
+            }
+            case BUILD -> {
+                player.setGameMode(GameMode.CREATIVE);
+                return;
             }
 
         }
@@ -53,10 +65,15 @@ public class SpongePlayer {
 
     private void setCurrentState(State state) {
         currentState = state;
-
     }
 
     public State getState(){
         return currentState;
+    }
+
+    public void setBuilding(Room room){
+        buildingRoom = room;
+        applyState(State.BUILD);
+
     }
 }

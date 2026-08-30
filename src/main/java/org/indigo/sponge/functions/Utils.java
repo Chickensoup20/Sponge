@@ -2,6 +2,7 @@ package org.indigo.sponge.functions;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -149,4 +150,15 @@ public class Utils {
     public static void sendSystemMessage(Player player, String string){
         player.sendMessage(mm.deserialize(Colors.spongeLogo + Colors.toMM(Colors.GOLD_LIGHT) + " " + string));
     }
+
+    public static ItemStack createItem(Material material, String name, String customTag){
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(mm.deserialize(name));
+        meta.getPersistentDataContainer().set(new NamespacedKey("sponge",customTag),PersistentDataType.STRING,customTag);
+        item.setItemMeta(meta);
+        return item;
+    }
+
+
 }

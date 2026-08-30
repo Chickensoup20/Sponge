@@ -23,6 +23,15 @@ java {
     toolchain.languageVersion = JavaLanguageVersion.of(25)
 }
 
+
+tasks.withType(xyz.jpenilla.runtask.task.AbstractRun::class) {
+    javaLauncher = javaToolchains.launcherFor {
+        vendor = JvmVendorSpec.JETBRAINS
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+    jvmArgs("-XX:+AllowEnhancedClassRedefinition")
+}
+
 tasks {
     runServer {
         // Configure the Minecraft version for our task.

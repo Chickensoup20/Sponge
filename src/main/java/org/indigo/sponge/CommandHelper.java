@@ -14,9 +14,11 @@ import io.papermc.paper.command.brigadier.BasicCommand;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.indigo.sponge.functions.Item;
 import org.indigo.sponge.functions.Utils;
 import org.indigo.sponge.rooms.Room;
@@ -24,8 +26,7 @@ import org.indigo.sponge.rooms.Room;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import static org.indigo.sponge.Sponge.mm;
-import static org.indigo.sponge.Sponge.rooms;
+import static org.indigo.sponge.Sponge.*;
 
 public class CommandHelper {
     public static LiteralArgumentBuilder<CommandSourceStack> flyspeedCommand() {
@@ -99,6 +100,7 @@ public class CommandHelper {
 
                         Room room = new Room(StringArgumentType.getString(ctx,"name"), 1);
                         room.tpToWorld(ctx.getSource().getPlayerOrThrow());
+                        playerStates.get(ctx.getSource().getPlayerOrThrow()).setBuilding(room);
                         return Command.SINGLE_SUCCESS;
                     }))
                 )
@@ -112,9 +114,33 @@ public class CommandHelper {
                                 .executes(ctx -> {
                                     Room room = rooms.get(StringArgumentType.getString(ctx, "Room Name"));
                                     room.tpToWorld(ctx.getSource().getPlayerOrThrow());
+                                    playerStates.get(ctx.getSource().getPlayerOrThrow()).setBuilding(room);
                                     return Command.SINGLE_SUCCESS;
                                 })
                         )
+                )
+                .then(Commands.literal("save")
+                        .then(Commands.argument("name", StringArgumentType.word())
+                            .suggests(((context, builder) -> {
+                                for (String room : rooms.keySet())
+                                    builder.suggest(room);
+                                return builder.buildFuture();
+                            }))
+                            .executes(ctx -> {
+
+                            rooms.get(StringArgumentType.getString(ctx,"name")).updateBounds();
+
+                            return Command.SINGLE_SUCCESS;
+                        }))
+                )
+                .then(Commands.literal("tools")
+                        .executes(ctx -> {
+                            ItemStack entranceWand = Utils.createItem(Material.BLAZE_ROD,Colors.toMM(Colors.ORANGE_LIGHT) + "Entrance Wand","entrancewand");
+                            ItemStack exitWand = Utils.createItem(Material.BREEZE_ROD,Colors.toMM(Colors.SKY_LIGHT) + "Exit Wand","exitwand");
+                            ctx.getSource().getPlayerOrThrow().give(entranceWand,exitWand);
+
+                            return Command.SINGLE_SUCCESS;
+                        })
                 )
 
                 .build();
@@ -122,7 +148,6 @@ public class CommandHelper {
     }
 
     private static CompletableFuture<Suggestions> getRoomSuggestions(final CommandContext<CommandSourceStack> ctx, final SuggestionsBuilder builder) {
-        // Suggest 1, 16, 32, and 64 to the user when they reach the 'amount' argument
         builder.suggest("create");
         return builder.buildFuture();
     }

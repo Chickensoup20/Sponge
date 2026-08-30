@@ -96,6 +96,7 @@ public class Colors {
     public static final TextColor SKY_DESATURATED = TextColor.color(0x557FD4);
     public static final String spongeLogo = toMM(YELLOW) + "[" + toMM(YELLOW_LIGHT_2) + "⁂" + toMM(YELLOW) + "]<reset>";
     public static String toMM(TextColor color){
+
         return "<" + color + ">";
     }
 }

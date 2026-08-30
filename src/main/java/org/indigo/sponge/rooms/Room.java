@@ -12,7 +12,10 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.util.Vector;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,13 +28,18 @@ public class Room {
     private transient SlimeWorld slimeWorld;
     private transient World world;
     private String name;
+    private Vector minLoc;
+    private Vector maxLoc;
     public Room(String name, int floor){
         slimeWorld = asp.createEmptyWorld(name,false, new SlimePropertyMap(),loader);
         SlimeWorldInstance worldInstance = asp.loadWorld(slimeWorld,false);
         world = worldInstance.getBukkitWorld();
+
+        minLoc = new Vector(0,0,0);
+        maxLoc = new Vector(0,0,0);
         this.name = name;
-        for(int x = -500; x < 500; x++){
-            for(int z = -500; z < 500; z++){
+        for(int x = 0; x < 500; x++){
+            for(int z = 0; z < 500; z++){
                 new Location(world,x,50,z).getBlock().setType(Material.BEDROCK);
             }
         }
@@ -67,5 +75,35 @@ public class Room {
         rooms.put(room.name,room);
         return room;
     }
+
+    public void updateBounds(){
+        int minX = 600,minY = 600,minZ = 600;
+        int maxX = -1000,maxY = -1000,maxZ = -1000;
+        for(int x = 0; x < 500; x++){
+            for(int z = 0; z < 500; z++){
+                for(int y = 51; y < 130; y++){
+                    Location loc = new Location(world,x,y,z);
+                    if(loc.getBlock().getType() != Material.AIR){
+                        minX = Math.min(minX,x);
+                        minY = Math.min(minY,y);
+                        minZ = Math.min(minZ,z);
+
+                        maxX = Math.max(maxX,x);
+                        maxY = Math.max(maxY,y);
+                        maxZ = Math.max(maxZ,z);
+                    }
+                }
+            }
+        }
+        minLoc = new Vector(minX,minY,minZ);
+        maxLoc = new Vector(maxX,maxY,maxZ);
+    }
+
+    public World getWorld(){
+        return world;
+    }
+
+
+
 
 }
