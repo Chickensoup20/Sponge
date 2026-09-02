@@ -9,7 +9,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,8 +18,11 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.indigo.sponge.functions.Item;
 
 import java.util.UUID;
 
@@ -78,7 +80,16 @@ public class GameEvents implements Listener {
     @EventHandler
     public void onDrop(PlayerDropItemEvent event)
     {
-
+        ItemStack item = event.getItemDrop().getItemStack();
+        UUID uuid = event.getItemDrop().getUniqueId();
+        ItemMeta meta = item.getItemMeta();
+        PersistentDataContainer data = meta.getPersistentDataContainer();
+        if (!data.has(new NamespacedKey(Sponge.plugin, "id")))
+        {
+            event.setCancelled(true);
+            return;
+        }
+        Item.itemGlow(uuid, item);
     }
 
 

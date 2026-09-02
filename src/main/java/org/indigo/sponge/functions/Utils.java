@@ -80,15 +80,15 @@ public class Utils {
         }
         if (type.equalsIgnoreCase("inc"))
         {
-            finalColor = finalColor.replace(target, "+" + valueStr + result);
+            finalColor = finalColor.replace(target, "<shadow:black>+" + valueStr + result);
         }
         else if (type.equalsIgnoreCase("dec"))
         {
-            finalColor = finalColor.replace(target, "-" + valueStr + result);
+            finalColor = finalColor.replace(target, "<shadow:black>-" + valueStr + result);
         }
         else
         {
-            finalColor = finalColor.replace(target, valueStr + result);
+            finalColor = finalColor.replace(target, "<shadow:black>" + valueStr + result);
         }
         return finalColor;
     }
@@ -99,9 +99,21 @@ public class Utils {
 
         String newLore = "";
         int ind = 0;
+        Boolean miniMsg = false;
         for (String currChar:loreList)
         {
-            ind++;
+            if (currChar.equalsIgnoreCase("<"))
+            {
+                miniMsg = true;
+            }
+            if (currChar.equalsIgnoreCase(">"))
+            {
+                miniMsg = false;
+            }
+            if (!miniMsg)
+            {
+                ind++;
+            }
             if (ind >= 40)
             {
                 if (currChar.equalsIgnoreCase("\\"))
