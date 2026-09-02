@@ -22,7 +22,9 @@ import org.bukkit.inventory.ItemStack;
 import org.indigo.sponge.functions.Item;
 import org.indigo.sponge.functions.Utils;
 import org.indigo.sponge.rooms.Room;
+import org.indigo.sponge.rooms.RoomType;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -98,7 +100,7 @@ public class CommandHelper {
                 .then(Commands.literal("create")
                     .then(Commands.argument("name", StringArgumentType.word()).executes(ctx -> {
 
-                        Room room = new Room(StringArgumentType.getString(ctx,"name"), 1);
+                        Room room = new Room(StringArgumentType.getString(ctx,"name"));
                         room.tpToWorld(ctx.getSource().getPlayerOrThrow());
                         playerStates.get(ctx.getSource().getPlayerOrThrow()).setBuilding(room);
                         return Command.SINGLE_SUCCESS;
@@ -128,20 +130,69 @@ public class CommandHelper {
                             }))
                             .executes(ctx -> {
 
-                            rooms.get(StringArgumentType.getString(ctx,"name")).updateBounds();
+                                try {
+                                    rooms.get(StringArgumentType.getString(ctx,"name")).updateBounds();
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
 
-                            return Command.SINGLE_SUCCESS;
+                                return Command.SINGLE_SUCCESS;
                         }))
                 )
                 .then(Commands.literal("tools")
                         .executes(ctx -> {
-                            ItemStack entranceWand = Utils.createItem(Material.BLAZE_ROD,Colors.toMM(Colors.ORANGE_LIGHT) + "Entrance Wand","entrancewand");
-                            ItemStack exitWand = Utils.createItem(Material.BREEZE_ROD,Colors.toMM(Colors.SKY_LIGHT) + "Exit Wand","exitwand");
+
                             ctx.getSource().getPlayerOrThrow().give(entranceWand,exitWand);
 
                             return Command.SINGLE_SUCCESS;
                         })
                 )
+                .then(Commands.literal("info")
+                        .then(Commands.argument("room", StringArgumentType.word())
+                                .suggests(((context, builder) -> {
+                                    for (String room : rooms.keySet())
+                                        builder.suggest(room);
+                                    return builder.buildFuture();
+                                }))
+                                .executes(ctx -> {
+                                    Room room = rooms.get(StringArgumentType.getString(ctx,"room"));
+                                    Player player = ctx.getSource().getPlayerOrThrow();
+                                    player.sendMessage(room.getName() + "info:");
+                                    player.sendMessage("Floor: " + room.getFloor());
+                                    player.sendMessage("Room Type: " + room.getRoomType());
+                                    return Command.SINGLE_SUCCESS;
+                                })
+                                .then(Commands.literal("name")
+                                    .then(Commands.argument("name", StringArgumentType.word())
+                                            .executes(ctx -> {
+                                                rooms.get(StringArgumentType.getString(ctx,"room")).setName(StringArgumentType.getString(ctx,"name"));
+                                                return Command.SINGLE_SUCCESS;
+                                            })
+                                    )
+                                )
+                                .then(Commands.literal("floor")
+                                        .then(Commands.argument("floor", StringArgumentType.word())
+                                        .executes(ctx -> {
+                                            rooms.get(StringArgumentType.getString(ctx,"room")).setFloor(StringArgumentType.getString(ctx,"floor"));
+                                            return Command.SINGLE_SUCCESS;
+                                        })
+                                ))
+                                .then(Commands.literal("type")
+                                        .then(Commands.argument("type", StringArgumentType.word())
+                                            .suggests(((context, builder) -> {
+                                                for (RoomType type : RoomType.values())
+                                                    builder.suggest(type.toString());
+                                                return builder.buildFuture();
+                                            }))
+                                        .executes(ctx -> {
+                                            rooms.get(StringArgumentType.getString(ctx,"room")).setRoomType(RoomType.valueOf(StringArgumentType.getString(ctx,"type")));
+                                            return Command.SINGLE_SUCCESS;
+                                        })
+                                ))
+
+                        )
+                )
+
 
                 .build();
 

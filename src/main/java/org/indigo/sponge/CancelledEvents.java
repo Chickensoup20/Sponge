@@ -22,11 +22,12 @@ import org.bukkit.event.player.PlayerJoinEvent;
 public class CancelledEvents implements Listener {
 
 
-    @EventHandler (priority = EventPriority.HIGHEST)
-    public void onBlockPhysics(BlockPhysicsEvent event) {
-        event.setCancelled(true);
-        event.getBlock().setBlockData(event.getBlock().getBlockData(),false);
-    }
+//    @EventHandler (priority = EventPriority.HIGHEST)
+//    public void onBlockPhysics(BlockPhysicsEvent event) {
+//
+//        event.setCancelled(true);
+//        event.getBlock().setBlockData(event.getBlock().getBlockData(),false);
+//    }
 
     @EventHandler
     public void onEntitySpawn(EntitySpawnEvent event) {

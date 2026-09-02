@@ -8,10 +8,13 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.indigo.sponge.rooms.Room;
 
+import java.util.HashMap;
+
 public class SpongePlayer {
     private final Player player;
     private State currentState;
     private Room buildingRoom;
+    public HashMap<String, Object> tempVars = new HashMap<>();
 
     public enum State {
         LOBBY,
@@ -21,7 +24,6 @@ public class SpongePlayer {
     }
 
     public SpongePlayer(Player player, State state) {
-        player.sendMessage("1");
         currentState = state;
         this.player = player;
         buildingRoom = null;
@@ -53,7 +55,8 @@ public class SpongePlayer {
         player.setSaturation(20);
         player.setFoodLevel(20);
         player.setFlySpeed(0.1f);
-        player.teleport(new Location(Bukkit.getWorld("lobby"), 64.5, 67.5, 127.5));
+        World lobby = Bukkit.getWorld("lobby");
+        player.teleport(lobby.getSpawnLocation());
 
     }
 
@@ -75,5 +78,9 @@ public class SpongePlayer {
         buildingRoom = room;
         applyState(State.BUILD);
 
+    }
+
+    public Room getBuildingRoom() {
+        return buildingRoom;
     }
 }

@@ -8,13 +8,16 @@ import com.infernalsuite.asp.api.loaders.SlimeLoader;
 import com.infernalsuite.asp.loaders.file.FileLoader;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.indigo.sponge.functions.Utils;
 import org.indigo.sponge.rooms.Room;
 import org.indigo.sponge.rooms.RoomEvents;
 
@@ -79,17 +82,20 @@ public class Sponge extends JavaPlugin {
                 throw new RuntimeException(e);
             }
         }
-
-
-
     }
+    public static ItemStack entranceWand = Utils.createItem(Material.BLAZE_ROD,Colors.toMM(Colors.ORANGE_LIGHT) + "Entrance Wand","entrancewand");
+    public static ItemStack exitWand = Utils.createItem(Material.BREEZE_ROD,Colors.toMM(Colors.SKY_LIGHT) + "Exit Wand","exitwand");
 
     @Override
     public void onDisable() {
         // Plugin shutdown logic
         for(Room room : rooms.values()){
             try {
+                if(!room.isHasSchematic()){
+                    room.updateBounds();
+                }
                 room.saveToFile();
+
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
