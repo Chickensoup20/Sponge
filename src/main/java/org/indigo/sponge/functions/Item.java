@@ -1,20 +1,22 @@
 package org.indigo.sponge.functions;
 
-import io.papermc.paper.datacomponent.item.FoodProperties;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.TextDisplay;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.components.FoodComponent;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.indigo.sponge.Sponge;
+import org.w3c.dom.Text;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.channels.Selector;
+import java.util.*;
 
 public class Item {
 
@@ -29,22 +31,22 @@ public class Item {
 
         meta.getPersistentDataContainer().set(new NamespacedKey(Sponge.plugin, "damage"), PersistentDataType.DOUBLE, damage);
         String damageStr = Utils.translateStats("inc", "damage", damage);
-        loreLineList = Utils.translateLore("Damage: " + damageStr, "<gray>", 1);
+        loreLineList = Utils.translateLore("<dark_gray><!i>• Damage: " + damageStr, "<gray>", 0);
         loreList.addAll(loreLineList);
         loreLineList.clear();
 
         meta.getPersistentDataContainer().set(new NamespacedKey(Sponge.plugin, "attack_speed"), PersistentDataType.DOUBLE, attack_speed);
         String atkSpeedStr = Utils.translateStats("inc", "attack_speed", attack_speed);
-        loreLineList = Utils.translateLore("Attack Speed: " + atkSpeedStr, "<gray>", 1);
+        loreLineList = Utils.translateLore("<dark_gray><!i>• Attack Speed: " + atkSpeedStr, "<gray>", 0);
         loreList.addAll(loreLineList);
         loreLineList.clear();
 
-        if (subCategory.equalsIgnoreCase("Light")  || subCategory.equalsIgnoreCase("Medium") || subCategory.equalsIgnoreCase("Heavy"))
+        if (subCategory.equalsIgnoreCase("Light") || subCategory.equalsIgnoreCase("Medium") || subCategory.equalsIgnoreCase("Heavy"))
         {
-            loreList.set(0, MiniMessage.miniMessage().deserialize(" <dark_gray><!i>" + subCategory + " Melee Weapon"));
-            meta.displayName(MiniMessage.miniMessage().deserialize("<!i><font:lore_icons>a<reset> <dark_gray>» <reset><!i>" + name));
+            loreList.set(0, MiniMessage.miniMessage().deserialize("<dark_gray><!i>└" + subCategory + " Melee Weapon"));
+            meta.displayName(MiniMessage.miniMessage().deserialize("<!i><font:lore_icons>a<reset><!i> <dark_gray>» <reset><!i>" + name));
             meta.setTooltipStyle(new NamespacedKey("minecraft", "melee"));
-            loreColor = "#FCA800";
+            loreColor = "<#FCA800>";
         }
         if (subCategory.equalsIgnoreCase("Ranged"))
         {
@@ -74,15 +76,15 @@ public class Item {
                 Double statValue = entry.getValue();
                 String statStr = Utils.translateStats("inc", stat, statValue);
                 stat = Utils.toProperCase( stat.replace("_", " "));
-                loreLineList = Utils.translateLore(stat + ": " + statStr, "<gray>", 1);
+                loreLineList = Utils.translateLore("<dark_gray><!i>• " + stat + ": " + statStr, "<gray>", 0);
                 loreList.addAll(loreLineList);
                 loreLineList.clear();
             }
         }
 
         loreList.add(Component.text(""));
-        loreList.add(MiniMessage.miniMessage().deserialize("<!i>   <gradient:dark_gray:" + loreColor + "><st>                <!st>⏴<reset><!i> <" + loreColor + ">ᴅᴇsᴄʀɪᴘᴛɪᴏɴ <gradient:" + loreColor + ":dark_gray>⏵<st>                <!st>"));
-        List<Component>  descList = Utils.translateLore(desc, "<gray>", 1);
+        loreList.add(MiniMessage.miniMessage().deserialize("<!i>" + loreColor + " »<st>                                                      <!st>« "));
+        List<Component>  descList = Utils.translateLore(desc, "<white>", 1);
         loreList.addAll(descList);
 
         loreList.add(Component.text(""));
@@ -111,7 +113,7 @@ public class Item {
 
         meta.getPersistentDataContainer().set(new NamespacedKey(Sponge.plugin, "armor"), PersistentDataType.DOUBLE, armor);
         String armorStr = Utils.translateStats("inc", "armor", armor);
-        loreLineList = Utils.translateLore("Armor: " + armorStr, "<gray>", 1);
+        loreLineList = Utils.translateLore("Armor: " + armorStr, "<white>", 1);
         loreList.addAll(loreLineList);
         loreLineList.clear();
 
@@ -141,7 +143,7 @@ public class Item {
                 Double statValue = entry.getValue();
                 String statStr = Utils.translateStats("inc", stat, statValue);
                 stat = Utils.toProperCase( stat.replace("_", " "));
-                loreLineList = Utils.translateLore(stat + ": " + statStr, "<gray>", 1);
+                loreLineList = Utils.translateLore(stat + ": " + statStr, "<white>", 1);
                 loreList.addAll(loreLineList);
                 loreLineList.clear();
             }
@@ -149,7 +151,7 @@ public class Item {
 
         loreList.add(Component.text(""));
         loreList.add(MiniMessage.miniMessage().deserialize("<!i>   <gradient:dark_gray:" + loreColor + "><st>                <!st>⏴<reset><!i> <" + loreColor + ">ᴅᴇsᴄʀɪᴘᴛɪᴏɴ <gradient:" + loreColor + ":dark_gray>⏵<st>                <!st>"));
-        List<Component>  descList = Utils.translateLore(desc, "<gray>", 1);
+        List<Component>  descList = Utils.translateLore(desc, "<white>", 1);
         loreList.addAll(descList);
 
         loreList.add(Component.text(""));
@@ -183,7 +185,7 @@ public class Item {
                 Double statValue = entry.getValue();
                 String statStr = Utils.translateStats("inc", stat, statValue);
                 stat = Utils.toProperCase( stat.replace("_", " "));
-                loreLineList = Utils.translateLore(stat + ": " + statStr, "<gray>", 1);
+                loreLineList = Utils.translateLore(stat + ": " + statStr, "<white>", 1);
                 loreList.addAll(loreLineList);
                 loreLineList.clear();
             }
@@ -191,7 +193,7 @@ public class Item {
 
         loreList.add(Component.text(""));
         loreList.add(MiniMessage.miniMessage().deserialize("<!i>   <gradient:dark_gray:#54FCFC><st>                <!st>⏴<reset><!i> <#54FCFC>ᴅᴇsᴄʀɪᴘᴛɪᴏɴ <gradient:#54FCFC:dark_gray>⏵<st>                <!st>"));
-        List<Component>  descList = Utils.translateLore(desc, "<gray>", 1);
+        List<Component>  descList = Utils.translateLore(desc, "<white>", 1);
         loreList.addAll(descList);
 
         loreList.add(Component.text(""));
@@ -233,7 +235,7 @@ public class Item {
                 Double statValue = entry.getValue();
                 String statStr = Utils.translateStats("inc", stat, statValue);
                 stat = Utils.toProperCase(stat.replace("_", " "));
-                loreLineList = Utils.translateLore(stat + ": " + statStr, "<gray>", 1);
+                loreLineList = Utils.translateLore(stat + ": " + statStr, "<white>", 1);
                 loreList.addAll(loreLineList);
                 loreLineList.clear();
             }
@@ -241,7 +243,7 @@ public class Item {
 
         loreList.add(Component.text(""));
         loreList.add(MiniMessage.miniMessage().deserialize("<!i>   <gradient:dark_gray:#FC5454><st>                <!st>⏴<reset><!i> <#FC5454>ᴅᴇsᴄʀɪᴘᴛɪᴏɴ <gradient:#FC5454:dark_gray>⏵<st>                <!st>"));
-        List<Component> descList = Utils.translateLore(desc, "<gray>", 1);
+        List<Component> descList = Utils.translateLore(desc, "<white>", 1);
         loreList.addAll(descList);
 
         loreList.add(Component.text(""));
@@ -250,7 +252,7 @@ public class Item {
         meta.setMaxStackSize(99);
         meta.isUnbreakable();
         meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
-        if (category == "consumable-food")
+        if (category.equalsIgnoreCase("consumable-food"))
         {
 
         }
@@ -263,5 +265,55 @@ public class Item {
             Sponge.floorAllItems.put(id, item);
         }
         Sponge.itemDic.put(id, item);
+    }
+    public static void itemGlow(UUID uuid, ItemStack item)
+    {
+        List<String> cats = List.of("none", "melee", "ranged", "magic", "accessory", "consumable");
+        List<String> colors = List.of("<#FFFFFF>", "<#FCA800>", "<#54FC54>", "<#7800FF>", "<#54FCFC>", "<#FC5454>");
+        List<String> glowColors = List.of("White", "Gold", "Green", "Dark purple", "Aqua", "Red");
+        HashMap<String, String> catToColor = new HashMap<>();
+        for (int i = 0; i < Math.min(cats.size(), colors.size()); i++) {
+            catToColor.put(cats.get(i), colors.get(i));
+        }
+        HashMap<String, String> catToGlow = new HashMap<>();
+        for (int i = 0; i < Math.min(cats.size(), glowColors.size()); i++) {
+            catToGlow.put(cats.get(i), glowColors.get(i));
+        }
+
+        String cat;
+        ItemMeta meta = item.getItemMeta();
+        PersistentDataContainer data = meta.getPersistentDataContainer();
+        if (data.has(new NamespacedKey(Sponge.plugin, "category")))
+        {
+            cat = meta.getPersistentDataContainer().get(new NamespacedKey(Sponge.plugin, "category"), PersistentDataType.STRING);
+            if (cat.startsWith("weapon") || cat.startsWith("armor") || cat.startsWith("consumable"))
+            {
+                String[] catList = cat.split("-");
+                cat = catList[1];
+                if (cat.equalsIgnoreCase("light") || cat.equalsIgnoreCase("medium") || cat.equalsIgnoreCase("heavy"))
+                {
+                    cat = "melee";
+                }
+                if (cat.equalsIgnoreCase("food") || cat.equalsIgnoreCase("throwable"))
+                {
+                    cat = "consumable";
+                }
+            }
+        }
+        else
+        {
+            cat = "none";
+        }
+        if (cat.contains("-"))
+        {
+            String[] catList = cat.split("-");
+            cat = catList[0];
+            String color = catToColor.get(cat);
+            String glow = catToGlow.get(cat);
+
+            Entity entity = Bukkit.getEntity(uuid);
+            entity.setGlowing(true);
+            Entity txtDisplay =  Bukkit.getEntity(entity.getWorld().spawn(entity.getLocation(), TextDisplay.class).getUniqueId());
+        }
     }
 }
