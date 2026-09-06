@@ -6,14 +6,14 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
-import org.indigo.sponge.rooms.Room;
+import org.indigo.sponge.rooms.RoomTemplate;
 
 import java.util.HashMap;
 
 public class SpongePlayer {
     private final Player player;
     private State currentState;
-    private Room buildingRoom;
+    private RoomTemplate buildingRoom;
     public HashMap<String, Object> tempVars = new HashMap<>();
 
     public enum State {
@@ -27,7 +27,7 @@ public class SpongePlayer {
         currentState = state;
         this.player = player;
         buildingRoom = null;
-        Sponge.playerStates.put(player,this);
+        Sponge.players.put(player,this);
     }
 
 
@@ -74,13 +74,13 @@ public class SpongePlayer {
         return currentState;
     }
 
-    public void setBuilding(Room room){
+    public void setBuilding(RoomTemplate room){
         buildingRoom = room;
         applyState(State.BUILD);
 
     }
 
-    public Room getBuildingRoom() {
+    public RoomTemplate getBuildingRoom() {
         return buildingRoom;
     }
 }

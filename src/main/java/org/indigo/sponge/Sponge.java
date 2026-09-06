@@ -14,12 +14,12 @@ import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.indigo.sponge.functions.Utils;
-import org.indigo.sponge.rooms.Room;
-import org.indigo.sponge.rooms.RoomEvents;
+import org.indigo.sponge.rooms.BuildEvents;
+import org.indigo.sponge.rooms.Floor;
+import org.indigo.sponge.rooms.RoomTemplate;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,7 +56,8 @@ public class Sponge extends JavaPlugin {
         System.out.println("[Sponge] Plugin Enabled!");
         getServer().getPluginManager().registerEvents(new CancelledEvents(), this);
         getServer().getPluginManager().registerEvents(new GameEvents(), this);
-        getServer().getPluginManager().registerEvents(new RoomEvents(), this);
+        getServer().getPluginManager().registerEvents(new BuildEvents(), this);
+
         if(getServer().getWorld("lobby") == null) {
             new WorldCreator("lobby")
                 .generator(new WorldGenerator())
@@ -70,30 +71,33 @@ public class Sponge extends JavaPlugin {
         InitAll.makeAccessories();
         InitAll.makeConsumables();
 
+        //Creating Floors
+        Floor floor1 = new Floor("sponge",1);
+
         //Loading rooms from files
-        Path roomsDir = Path.of("rooms");
+        Path roomsDir = Path.of("room_templates");
 
         if (Files.exists(roomsDir)) {
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(roomsDir, "*.json")) {
                 for (Path file : stream) {
-                    Room.fromFile(file.toString());
+                    String fileName = file.getFileName().toString();
+                    String roomName = fileName.substring(0, fileName.length() - ".json".length()); // "test"
+                    RoomTemplate.fromFile(roomName);
                 }
             } catch (IOException | CorruptedWorldException | NewerFormatException | UnknownWorldException e) {
                 throw new RuntimeException(e);
             }
         }
     }
+
     public static ItemStack entranceWand = Utils.createItem(Material.BLAZE_ROD,Colors.toMM(Colors.ORANGE_LIGHT) + "Entrance Wand","entrancewand");
     public static ItemStack exitWand = Utils.createItem(Material.BREEZE_ROD,Colors.toMM(Colors.SKY_LIGHT) + "Exit Wand","exitwand");
 
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-        for(Room room : rooms.values()){
+        for(RoomTemplate room : allRooms.values()){
             try {
-                if(!room.isHasSchematic()){
-                    room.updateBounds();
-                }
                 room.saveToFile();
 
             } catch (IOException e) {
@@ -109,7 +113,7 @@ public class Sponge extends JavaPlugin {
 
     public static boolean gameLoaded = false;
     public static List<Player> joinedPlayers = new ArrayList<>();
-    public static HashMap<Player, SpongePlayer> playerStates = new HashMap<>();
+    public static HashMap<Player, SpongePlayer> players = new HashMap<>();
 
 
     //Item Dictionaries (item id, value)
@@ -119,5 +123,6 @@ public class Sponge extends JavaPlugin {
     public static HashMap<String, HashMap<String, Double>> itemStatDic = new HashMap<>(); // Contains additional item stats
 
     //Room stuff
-    public static HashMap<String,Room> rooms = new HashMap<>();
+    public static HashMap<String,Floor> floors = new HashMap<>();
+    public static HashMap<String, RoomTemplate> allRooms = new HashMap<>();
 }
