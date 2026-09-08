@@ -13,12 +13,11 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class Connector {
-    private World world;
-    public BoundingBox boundingBox;
-    private BlockDisplay display;
+    private transient World world;
+    public transient BoundingBox boundingBox;
+    private transient BlockDisplay display;
     private ConnectorType type;
-    private Location corner1;
-    private Location corner2;
+    private double x1, y1, z1, x2, y2, z2;
     private Vector direction;
 
     public enum ConnectorType{
@@ -27,20 +26,20 @@ public class Connector {
     }
     public Connector(Location corner1, Location corner2, ConnectorType type,Vector direction){
         this.world = corner1.getWorld();
-        this.corner1 = corner1;
-        this.corner2 = corner2;
+        this.x1 = corner1.getX(); this.y1 = corner1.getY(); this.z1 = corner1.getZ();
+        this.x2 = corner2.getX(); this.y2 = corner2.getY(); this.z2 = corner2.getZ();
         boundingBox = new BoundingBox(corner1.x(),corner1.y(),corner1.z(),corner2.x(),corner2.y(),corner2.z());
         this.type = type;
         this.direction = direction;
     }
 
-    public void setCorner1(Location location){
-        this.corner1 = location;
+    public void setCorner1(Location l){
+        x1 = l.getX(); y1 = l.getY(); z1 = l.getZ();
         updateBounds();
     }
 
-    public void setCorner2(Location location){
-        this.corner2 = location;
+    public void setCorner2(Location l){
+        x2 = l.getX(); y2 = l.getY(); z2 = l.getZ();
         updateBounds();
     }
 
@@ -49,8 +48,11 @@ public class Connector {
     }
 
     private void updateBounds(){
-        boundingBox.resize(corner1.x(),corner1.y(),corner1.z(),corner2.x(),corner2.y(),corner2.z());
-        boundingBox.resize(boundingBox.getMinX(), Math.floor(boundingBox.getMinY()), boundingBox.getMinZ(), boundingBox.getMaxX()+1, boundingBox.getMaxY()+1, boundingBox.getMaxZ()+1);
+        boundingBox = new BoundingBox(x1, y1, z1, x2, y2, z2);
+        boundingBox.resize(
+                boundingBox.getMinX(), Math.floor(boundingBox.getMinY()), boundingBox.getMinZ(),
+                boundingBox.getMaxX() + 1, boundingBox.getMaxY() + 1, boundingBox.getMaxZ() + 1
+        );
     }
 
     public void spawnDisplayEntity() {
@@ -76,7 +78,7 @@ public class Connector {
         entity.setTransformation(new Transformation(
                 new Vector3f(0, 0, 0),
                 new Quaternionf(),
-                new Vector3f(sizeX, sizeY, sizeZ),
+                new Vector3f((float) (sizeX+0.002), (float) (sizeY+0.002), (float) (sizeZ+0.002)),
                 new Quaternionf()
         ));
 
@@ -90,5 +92,10 @@ public class Connector {
             display.remove();
         }
         display = null;
+    }
+
+    public void rebuild(World world) {
+        this.world = world;
+        updateBounds();
     }
 }

@@ -1,6 +1,10 @@
 package org.indigo.sponge.rooms;
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.infernalsuite.asp.api.events.LoadSlimeWorldEvent;
 import com.infernalsuite.asp.api.exceptions.CorruptedWorldException;
 import com.infernalsuite.asp.api.exceptions.NewerFormatException;
 import com.infernalsuite.asp.api.exceptions.UnknownWorldException;
@@ -19,6 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -49,6 +54,7 @@ public class RoomTemplate {
     private transient World world;
     private String floorName;
     public boolean hasSchematic = false;
+    private transient SlimeWorldInstance worldInstance;
 
 
     public RoomTemplate(String name, String floorName, RoomType roomType){
@@ -61,7 +67,8 @@ public class RoomTemplate {
 
         //World Creation
         slimeWorld = asp.createEmptyWorld(name, false, new SlimePropertyMap(), loader);
-        SlimeWorldInstance worldInstance = asp.loadWorld(slimeWorld, false);
+        this.worldInstance = asp.loadWorld(slimeWorld, false);
+
         world = worldInstance.getBukkitWorld();
         localBounds = new BoundingBox(0,0,0,0,0,0);
         for (int x = 0; x < 500; x++) {
@@ -72,6 +79,15 @@ public class RoomTemplate {
 
 
     }
+
+    public void unload(){
+        for(Connector exit : exitConnectors){
+            exit.removeDisplayEntity();
+        }
+        entranceConnector.removeDisplayEntity();
+    }
+
+
 
 
     //Persistence
@@ -85,12 +101,27 @@ public class RoomTemplate {
 
     }
 
+    private static final Gson GSON = new GsonBuilder()
+            .setExclusionStrategies(new ExclusionStrategy() {
+                @Override public boolean shouldSkipClass(Class<?> c) {
+                    String n = c.getName();
+                    return n.startsWith("org.bukkit.craftbukkit")
+                            || n.startsWith("net.minecraft")
+                            || org.bukkit.World.class.isAssignableFrom(c)
+                            || org.bukkit.entity.Entity.class.isAssignableFrom(c)
+                            || org.bukkit.Location.class.isAssignableFrom(c)
+                            || com.infernalsuite.asp.api.world.SlimeWorld.class.isAssignableFrom(c);
+                }
+                @Override public boolean shouldSkipField(FieldAttributes f) { return false; }
+            })
+            .setPrettyPrinting()
+            .create();
+
     public void saveToFile() throws IOException {
         syncBoundsToFields();
-        Gson gson = new Gson();
         Path path = Path.of("room_templates/" + name + ".json");
         Files.createDirectories(path.getParent());
-        Files.writeString(path, gson.toJson(this));
+        Files.writeString(path, GSON.toJson(this));
     }
 
     public RoomTemplate() {
@@ -98,18 +129,26 @@ public class RoomTemplate {
 
     public static RoomTemplate fromFile(String roomName) throws IOException, CorruptedWorldException, NewerFormatException, UnknownWorldException {
         Path path = Path.of("room_templates/" + roomName + ".json");
-        RoomTemplate room = new Gson().fromJson(Files.readString(path), RoomTemplate.class);
+        RoomTemplate room = GSON.fromJson(Files.readString(path), RoomTemplate.class);
         room.slimeWorld = asp.readWorld(loader, room.name, false, new SlimePropertyMap());
-        SlimeWorldInstance worldInstance = asp.loadWorld(room.slimeWorld, false);
-        room.world = worldInstance.getBukkitWorld();
+        room.worldInstance = asp.loadWorld(room.slimeWorld, true);
+        room.world = room.worldInstance.getBukkitWorld();
         room.rebuildBounds();
         floors.get(room.floorName).addRoom(room);
         allRooms.put(room.name, room);
+        for (Connector c : room.exitConnectors) c.rebuild(room.world);
+        if (room.entranceConnector != null) room.entranceConnector.rebuild(room.world);
         return room;
+    }
+
+    public void spawnDisplays() {
+        for (Connector c : exitConnectors) c.spawnDisplayEntity();
+        if (entranceConnector != null) entranceConnector.spawnDisplayEntity();
     }
 
     public void tpToWorld(Player player) {
         player.teleport(new Location(world, 0, 51, 0));
+        spawnDisplays();
     }
 
     public void updateBounds() throws IOException {

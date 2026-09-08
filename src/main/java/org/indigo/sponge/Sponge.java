@@ -99,7 +99,7 @@ public class Sponge extends JavaPlugin {
         for(RoomTemplate room : allRooms.values()){
             try {
                 room.saveToFile();
-
+                room.unload();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
