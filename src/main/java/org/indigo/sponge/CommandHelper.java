@@ -12,9 +12,11 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Player;
 import org.indigo.sponge.functions.Utils;
+import org.indigo.sponge.rooms.Game;
 import org.indigo.sponge.rooms.RoomTemplate;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static org.indigo.sponge.Sponge.*;
@@ -183,6 +185,18 @@ public class CommandHelper {
 
 
                 .build();
+
+    }
+
+    public static LiteralCommandNode<CommandSourceStack> testCommand() {
+
+        return Commands.literal("test")
+                .executes(ctx -> {
+                    Player player = ctx.getSource().getPlayerOrThrow();
+                    Game game = new Game(List.of(player));
+                    game.start();
+                    return Command.SINGLE_SUCCESS;
+                }).build();
 
     }
 

@@ -50,6 +50,7 @@ public class Sponge extends JavaPlugin {
             commands.registrar().register(CommandHelper.lobbyCommand());
             commands.registrar().register(CommandHelper.giveCommand(),List.of("give","get"));
             commands.registrar().register(CommandHelper.rooms());
+            commands.registrar().register(CommandHelper.testCommand());
         });
 
         // Plugin startup logic

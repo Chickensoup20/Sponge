@@ -44,7 +44,7 @@ public class RoomTemplate {
         SECRET
     }
 
-    private String name;
+    public String name;
     public List<Connector> exitConnectors = new ArrayList<>();
     public Connector entranceConnector;
     private transient BoundingBox localBounds;
@@ -152,6 +152,7 @@ public class RoomTemplate {
     }
 
     public void updateBounds() throws IOException {
+        unload();
         int minX = 600, minY = 600, minZ = 600;
         int maxX = -1000, maxY = -1000, maxZ = -1000;
         for (int x = 0; x < 500; x++) {
@@ -186,6 +187,7 @@ public class RoomTemplate {
         try (ClipboardWriter writer = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(new FileOutputStream(file))) {
             writer.write(clipboard);
         }
+        spawnDisplays();
         hasSchematic = true;
 
     }
