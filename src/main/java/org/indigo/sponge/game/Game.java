@@ -1,4 +1,4 @@
-package org.indigo.sponge.rooms;
+package org.indigo.sponge.game;
 
 import com.infernalsuite.asp.api.world.SlimeWorld;
 import com.infernalsuite.asp.api.world.SlimeWorldInstance;
@@ -11,6 +11,9 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.indigo.sponge.game.rooms.Connector;
+import org.indigo.sponge.game.rooms.RoomInstance;
+import org.indigo.sponge.game.rooms.RoomTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +27,8 @@ public class Game {
     private SlimeWorld slimeWorld;
     private World world;
     private List<BoundingBox> roomBoxes = new ArrayList<>();
-    private List<RoomInstance> instances = new ArrayList<>();
+    public List<RoomInstance> instances = new ArrayList<>();
+    public List<Player> alivePlayers;
 
     /**
      * Starts a new game instance for the given players: creates a dedicated
@@ -43,6 +47,8 @@ public class Game {
         room.generate(firstPaste, 0);
         roomBoxes.add(room.boundingBox);
         instances.add(room);
+        runningGames.add(this);
+        alivePlayers = players;
     }
 
     /**
@@ -67,6 +73,8 @@ public class Game {
             roomBoxes.add(next.boundingBox);
             instances.add(next);
         }
+
+
     }
 
     /**
@@ -75,9 +83,9 @@ public class Game {
      * overlap another already-placed room, the exit is sealed instead. On success,
      * every other exit on the previous room is sealed off.
      */
-    public void nextRoom() {
+    public void nextRoom(Connector exit) {
         RoomInstance previousRoom = instances.get(instances.size() - 1);
-        Connector exit = previousRoom.exits.get(0);
+
 
         if (exit.isBlocked()) return;
 

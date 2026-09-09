@@ -1,4 +1,4 @@
-package org.indigo.sponge.rooms;
+package org.indigo.sponge.game.rooms;
 
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -6,7 +6,6 @@ import com.sk89q.worldedit.math.transform.Transform;
 import org.bukkit.*;
 import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Transformation;

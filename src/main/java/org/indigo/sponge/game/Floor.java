@@ -1,6 +1,7 @@
-package org.indigo.sponge.rooms;
+package org.indigo.sponge.game;
 
 import org.indigo.sponge.Sponge;
+import org.indigo.sponge.game.rooms.RoomTemplate;
 
 import java.util.ArrayList;
 import java.util.List;

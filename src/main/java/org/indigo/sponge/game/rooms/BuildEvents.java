@@ -1,4 +1,4 @@
-package org.indigo.sponge.rooms;
+package org.indigo.sponge.game.rooms;
 
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
@@ -28,7 +28,6 @@ public class BuildEvents implements Listener {
             RoomTemplate room = Sponge.players.get(event.getPlayer()).getBuildingRoom();
             if(event.getItem() != null){
                 Location clickedBlock = event.getClickedBlock().getLocation();
-                event.getPlayer().sendMessage(event.getBlockFace().getDirection().toString());
                 if(event.getItem().isSimilar(Sponge.entranceWand)){
                     event.setCancelled(true);
                     Connector entrance = room.entranceConnector;
@@ -80,7 +79,6 @@ public class BuildEvents implements Listener {
                             newExit = false;
                         }
                     }
-                    event.getPlayer().sendMessage(exit.boundingBox.toString());
                 }
             }
         }

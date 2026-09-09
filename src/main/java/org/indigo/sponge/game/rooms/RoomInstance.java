@@ -1,4 +1,4 @@
-package org.indigo.sponge.rooms;
+package org.indigo.sponge.game.rooms;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
