@@ -6,7 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
-import org.indigo.sponge.rooms.RoomTemplate;
+import org.indigo.sponge.game.rooms.RoomTemplate;
 
 import java.util.HashMap;
 

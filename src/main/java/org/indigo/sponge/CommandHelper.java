@@ -12,8 +12,8 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.entity.Player;
 import org.indigo.sponge.functions.Utils;
-import org.indigo.sponge.rooms.Game;
-import org.indigo.sponge.rooms.RoomTemplate;
+import org.indigo.sponge.game.Game;
+import org.indigo.sponge.game.rooms.RoomTemplate;
 
 import java.io.IOException;
 import java.util.List;
@@ -195,10 +195,7 @@ public class CommandHelper {
                     Player player = ctx.getSource().getPlayerOrThrow();
                     Game game = new Game(List.of(player));
                     game.start();
-                    game.nextRoom();
-                    game.nextRoom();
-                    game.nextRoom();
-                    game.nextRoom();
+
                     return Command.SINGLE_SUCCESS;
                 }).build();
 

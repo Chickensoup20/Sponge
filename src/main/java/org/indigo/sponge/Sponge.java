@@ -17,9 +17,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.indigo.sponge.functions.Utils;
-import org.indigo.sponge.rooms.BuildEvents;
-import org.indigo.sponge.rooms.Floor;
-import org.indigo.sponge.rooms.RoomTemplate;
+import org.indigo.sponge.game.RunningGameEvents;
+import org.indigo.sponge.game.rooms.BuildEvents;
+import org.indigo.sponge.game.Floor;
+import org.indigo.sponge.game.Game;
+import org.indigo.sponge.game.rooms.RoomTemplate;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,6 +53,7 @@ public class Sponge extends JavaPlugin {
             commands.registrar().register(CommandHelper.giveCommand(),List.of("give","get"));
             commands.registrar().register(CommandHelper.rooms());
             commands.registrar().register(CommandHelper.testCommand());
+
         });
 
         // Plugin startup logic
@@ -58,6 +61,7 @@ public class Sponge extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new CancelledEvents(), this);
         getServer().getPluginManager().registerEvents(new GameEvents(), this);
         getServer().getPluginManager().registerEvents(new BuildEvents(), this);
+        getServer().getPluginManager().registerEvents(new RunningGameEvents(), this);
 
         if(getServer().getWorld("lobby") == null) {
             new WorldCreator("lobby")
@@ -126,4 +130,5 @@ public class Sponge extends JavaPlugin {
     //Room stuff
     public static HashMap<String,Floor> floors = new HashMap<>();
     public static HashMap<String, RoomTemplate> allRooms = new HashMap<>();
+    public static List<Game> runningGames = new ArrayList<>();
 }
