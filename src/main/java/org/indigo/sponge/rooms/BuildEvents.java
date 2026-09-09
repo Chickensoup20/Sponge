@@ -15,6 +15,13 @@ public class BuildEvents implements Listener {
     boolean newEntrance = false;
     boolean newExit = false;
     Connector exit;
+
+    /**
+     * Handles player interactions while in BUILD state: left/right-clicking with
+     * the entrance wand defines a room's entrance connector, and doing the same
+     * with the exit wand defines (or, while sneaking, removes) exit connectors.
+     * @param event the player interact event to handle
+     */
     @EventHandler
     public void interactEvent(PlayerInteractEvent event){
         if(Sponge.players.get(event.getPlayer()).getState() == SpongePlayer.State.BUILD){
@@ -55,7 +62,7 @@ public class BuildEvents implements Listener {
                                 connector.removeDisplayEntity();
                                 exits.remove(connector);
                                 return;
-                            }//
+                            }
                         }
                     }
                     if(newExit == false){

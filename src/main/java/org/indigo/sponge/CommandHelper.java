@@ -195,6 +195,10 @@ public class CommandHelper {
                     Player player = ctx.getSource().getPlayerOrThrow();
                     Game game = new Game(List.of(player));
                     game.start();
+                    game.nextRoom();
+                    game.nextRoom();
+                    game.nextRoom();
+                    game.nextRoom();
                     return Command.SINGLE_SUCCESS;
                 }).build();
 
