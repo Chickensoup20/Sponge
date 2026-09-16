@@ -10,10 +10,13 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 import org.indigo.sponge.functions.Utils;
 import org.indigo.sponge.game.Game;
-import org.indigo.sponge.game.rooms.RoomTemplate;
+import org.indigo.sponge.game.RoomTemplate;
 
 import java.io.IOException;
 import java.util.List;
@@ -88,13 +91,28 @@ public class CommandHelper {
 
         return Commands.literal("rooms")
             .requires(sender -> sender.getSender().hasPermission("permission.dev"))
+                .executes(ctx -> {
+                    for(RoomTemplate room : allRooms.values()){
+                        ctx.getSource().getPlayerOrThrow().sendMessage("Room name: " + room.name + ", " + room.roomType);
+                    }
+                    return Command.SINGLE_SUCCESS;
+                })
                 .then(Commands.literal("create")
-                    .then(Commands.argument("name", StringArgumentType.word()).executes(ctx -> {
-                        RoomTemplate room = new RoomTemplate(StringArgumentType.getString(ctx,"name"), "sponge", RoomTemplate.RoomType.NORMAL);
-                        room.tpToWorld(ctx.getSource().getPlayerOrThrow());
-                        players.get(ctx.getSource().getPlayerOrThrow()).setBuilding(room);
-                        return Command.SINGLE_SUCCESS;
-                    }))
+                    .then(Commands.argument("name", StringArgumentType.word())
+                        .then(Commands.argument("type", StringArgumentType.word())
+                                .suggests((context, builder) -> {
+                                    for(RoomTemplate.RoomType type : RoomTemplate.RoomType.values()){
+                                        builder.suggest(type.toString());
+                                    }
+                                    return builder.buildFuture();
+                                })
+                            .executes(ctx -> {
+                            RoomTemplate room = new RoomTemplate(StringArgumentType.getString(ctx,"name"), "sponge", RoomTemplate.RoomType.valueOf(StringArgumentType.getString(ctx,"type")));
+                            room.tpToWorld(ctx.getSource().getPlayerOrThrow());
+                            players.get(ctx.getSource().getPlayerOrThrow()).setBuilding(room);
+                            return Command.SINGLE_SUCCESS;
+                        }))
+                    )
                 )
                 .then(Commands.literal("goto")
                         .then(Commands.argument("Room Name", StringArgumentType.word())
@@ -193,11 +211,52 @@ public class CommandHelper {
         return Commands.literal("test")
                 .executes(ctx -> {
                     Player player = ctx.getSource().getPlayerOrThrow();
-                    Game game = new Game(List.of(player));
+                    Game game = new Game(List.of(player),floors.get("sponge"));
                     game.start();
 
                     return Command.SINGLE_SUCCESS;
                 }).build();
+
+    }
+    public static LiteralCommandNode<CommandSourceStack> pathCommand() {
+
+        return Commands.literal("path")
+                .then(Commands.literal("dock")
+                        .executes(ctx -> {
+                            dockPoints.add(ctx.getSource().getPlayerOrThrow().getEyeLocation().toVector());
+                            dockRotations.add((int) (Math.round(ctx.getSource().getPlayerOrThrow().getYaw() / 90.0) * 90));
+                            return Command.SINGLE_SUCCESS;
+                        })
+                )
+                .then(Commands.literal("point")
+                        .executes(ctx -> {
+
+                            pathPoints.add(ctx.getSource().getPlayerOrThrow().getEyeLocation().toVector());
+
+                            return Command.SINGLE_SUCCESS;
+                        })
+                ).then(Commands.literal("test")
+                        .executes(ctx -> {
+                            Player player = ctx.getSource().getPlayerOrThrow();
+
+                            Vector startVec = (Vector) dockPoints.getFirst();
+                            Vector endVec = (Vector) dockPoints.getLast();
+
+                            Vector direction = endVec.clone().subtract(startVec);
+                            double distance = direction.length();
+                            direction.normalize();
+
+                            for (double i = 0; i < distance; i += 0.5) {
+                                Vector point = startVec.clone().add(direction.clone().multiply(i));
+                                Location loc = point.toLocation(player.getWorld());
+
+                                // do something at this location, e.g. spawn a particle
+                                loc.getWorld().spawnParticle(Particle.FLAME, loc, 1);
+                            }
+                            return Command.SINGLE_SUCCESS;
+                        })
+                ).build();
+
 
     }
 

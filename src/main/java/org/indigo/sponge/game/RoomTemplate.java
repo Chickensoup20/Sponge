@@ -1,4 +1,4 @@
-package org.indigo.sponge.game.rooms;
+package org.indigo.sponge.game;
 
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
@@ -26,6 +26,8 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
+import org.indigo.sponge.Sponge;
+import org.indigo.sponge.game.rooms.Connector;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,10 +40,12 @@ import java.util.List;
 import static org.indigo.sponge.Sponge.*;
 
 public class RoomTemplate {
-    public enum RoomType{
+    public enum RoomType implements RoomNode {
         NORMAL,
         HARD,
-        SECRET
+        SECRET,
+        BOSS,
+        BRANCH
     }
 
     public String name;
@@ -50,12 +54,14 @@ public class RoomTemplate {
     public boolean hasSchematic = false;
     private transient BoundingBox localBounds;
     private double minX, minY, minZ, maxX, maxY, maxZ;
-    private RoomType roomType;
+    public RoomType roomType;
     private transient SlimeWorld slimeWorld;
     private transient World world;
     private String floorName;
     private transient SlimeWorldInstance worldInstance;
     private static final Vector3 ENTRANCE_LOCAL_DIRECTION = Vector3.at(-1, 0, 0);
+    private static final Vector3 BACKWARD_DIRECTION = Vector3.at(-1, 0, 0);
+
 
     private static final Gson GSON = new GsonBuilder()
             .setExclusionStrategies(new ExclusionStrategy() {
@@ -97,6 +103,10 @@ public class RoomTemplate {
             for (int z = 0; z < 500; z++) {
                 new Location(world, x, 50, z).getBlock().setType(Material.BEDROCK);
             }
+        }
+
+        if (roomType == RoomType.BRANCH){
+            branchRooms.add(this);
         }
     }
 
@@ -211,6 +221,9 @@ public class RoomTemplate {
         allRooms.put(room.name, room);
         for (Connector c : room.exitConnectors) c.rebuild(room.world);
         if (room.entranceConnector != null) room.entranceConnector.rebuild(room.world);
+        if (room.roomType == RoomType.BRANCH){
+            branchRooms.add(room);
+        }
         return room;
     }
 
@@ -289,5 +302,16 @@ public class RoomTemplate {
         double deltaDeg = Math.toDegrees(fromAngle - toAngle);
         deltaDeg = ((deltaDeg % 360) + 360) % 360;
         return (int) Math.round(deltaDeg / 90.0) * 90 % 360;
+    }
+
+    /**
+     * Checks whether the given direction points in the disallowed "backward"
+     * world direction (<-1,0,0>), which would cause a room to try to generate
+     * back toward where the player came from.
+     * @param direction the direction to test
+     * @return true if the direction is (approximately) backward
+     */
+    public static boolean isBackwardDirection(Vector3 direction) {
+        return direction.normalize().dot(BACKWARD_DIRECTION) > 0.99;
     }
 }

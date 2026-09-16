@@ -22,7 +22,7 @@ public class RunningGameEvents implements Listener {
                         }
                     }
                     if (count == amountPlayers){
-                        game.nextRoom(exit);
+                        game.expandFrom(exit);
                         break;
                     }
                 }

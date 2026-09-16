@@ -1,5 +1,9 @@
 package org.indigo.sponge;
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.infernalsuite.asp.api.AdvancedSlimePaperAPI;
 import com.infernalsuite.asp.api.exceptions.CorruptedWorldException;
 import com.infernalsuite.asp.api.exceptions.NewerFormatException;
@@ -16,12 +20,10 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Vector;
 import org.indigo.sponge.functions.Utils;
-import org.indigo.sponge.game.RunningGameEvents;
+import org.indigo.sponge.game.*;
 import org.indigo.sponge.game.rooms.BuildEvents;
-import org.indigo.sponge.game.Floor;
-import org.indigo.sponge.game.Game;
-import org.indigo.sponge.game.rooms.RoomTemplate;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,6 +55,7 @@ public class Sponge extends JavaPlugin {
             commands.registrar().register(CommandHelper.giveCommand(),List.of("give","get"));
             commands.registrar().register(CommandHelper.rooms());
             commands.registrar().register(CommandHelper.testCommand());
+            commands.registrar().register(CommandHelper.pathCommand());
 
         });
 
@@ -77,7 +80,7 @@ public class Sponge extends JavaPlugin {
         InitAll.makeConsumables();
 
         //Creating Floors
-        Floor floor1 = new Floor("sponge",1);
+        Floor floor1 = new Floor("sponge",1,List.of(RoomTemplate.RoomType.NORMAL,new Branch(List.of(RoomTemplate.RoomType.BOSS))));
 
         //Loading rooms from files
         Path roomsDir = Path.of("room_templates");
@@ -93,6 +96,28 @@ public class Sponge extends JavaPlugin {
                 throw new RuntimeException(e);
             }
         }
+
+        Path pathsDir = Path.of("lobby/paths.json");
+        try {
+            pathPoints = GSON.fromJson(Files.readString(pathsDir), List.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        pathsDir = Path.of("lobby/docks.json");
+        try {
+            dockPoints = GSON.fromJson(Files.readString(pathsDir), List.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        pathsDir = Path.of("lobby/dockRots.json");
+        try {
+            dockRotations = GSON.fromJson(Files.readString(pathsDir), List.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public static ItemStack entranceWand = Utils.createItem(Material.BLAZE_ROD,Colors.toMM(Colors.ORANGE_LIGHT) + "Entrance Wand","entrancewand");
@@ -109,7 +134,49 @@ public class Sponge extends JavaPlugin {
                 throw new RuntimeException(e);
             }
         }
+
+        Path path = Path.of("lobby/paths.json");
+        try {
+            Files.createDirectories(path.getParent());
+            Files.writeString(path, GSON.toJson(pathPoints));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        path = Path.of("lobby/docks.json");
+        try {
+            Files.createDirectories(path.getParent());
+            Files.writeString(path, GSON.toJson(dockPoints));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        path = Path.of("lobby/dockRots.json");
+        try {
+            Files.createDirectories(path.getParent());
+            Files.writeString(path, GSON.toJson(dockRotations));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
     }
+
+    private static final Gson GSON = new GsonBuilder()
+            .setExclusionStrategies(new ExclusionStrategy() {
+                @Override public boolean shouldSkipClass(Class<?> c) {
+                    String n = c.getName();
+                    return n.startsWith("org.bukkit.craftbukkit")
+                            || n.startsWith("net.minecraft")
+                            || org.bukkit.World.class.isAssignableFrom(c)
+                            || org.bukkit.entity.Entity.class.isAssignableFrom(c)
+                            || org.bukkit.Location.class.isAssignableFrom(c)
+                            || com.infernalsuite.asp.api.world.SlimeWorld.class.isAssignableFrom(c);
+                }
+                @Override public boolean shouldSkipField(FieldAttributes f) { return false; }
+            })
+            .setPrettyPrinting()
+            .create();
 
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
@@ -131,4 +198,10 @@ public class Sponge extends JavaPlugin {
     public static HashMap<String,Floor> floors = new HashMap<>();
     public static HashMap<String, RoomTemplate> allRooms = new HashMap<>();
     public static List<Game> runningGames = new ArrayList<>();
+    public static List<RoomTemplate> branchRooms = new ArrayList<>();
+
+    //Spawn visuals
+    public static List<Vector> pathPoints = new ArrayList<>();
+    public static List<Vector> dockPoints = new ArrayList<>();
+    public static List<Integer> dockRotations = new ArrayList<>();
 }

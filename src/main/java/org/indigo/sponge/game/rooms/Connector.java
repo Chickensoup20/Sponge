@@ -189,6 +189,7 @@ public class Connector {
         ));
 
         entity.setBrightness(new Display.Brightness(15,15));
+        entity.setPersistent(false);
 
         display = entity;
     }

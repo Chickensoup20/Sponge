@@ -8,6 +8,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
 import org.indigo.sponge.Sponge;
 import org.indigo.sponge.SpongePlayer;
+import org.indigo.sponge.game.RoomTemplate;
 
 import java.util.List;
 

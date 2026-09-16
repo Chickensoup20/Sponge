@@ -19,6 +19,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.indigo.sponge.game.RoomTemplate;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -167,5 +168,126 @@ public class RoomInstance {
      */
     private Vector getRelativeLocation(Vector worldLocation, Vector relativePoint){
         return relativePoint.subtract(worldLocation);
+    }
+
+    /**
+     * Holds a candidate placement found by findPlacement(): which template fits,
+     * at what rotation, pasted where, with its predicted world bounding box.
+     */
+    private static class Placement {
+        final RoomTemplate template;
+        final int rotation;
+        final BlockVector3 pasteAt;
+
+        Placement(RoomTemplate template, int rotation, BlockVector3 pasteAt) {
+            this.template = template;
+            this.rotation = rotation;
+            this.pasteAt = pasteAt;
+        }
+    }
+
+    /**
+     * Searches candidatePool for a template and 90° rotation whose entrance faces
+     * the given exit and whose predicted bounding box doesn't overlap any existing
+     * room instance other than sourceRoom (which is excluded since it's always
+     * meant to touch flush). Performs no world mutation.
+     * @param exit the exit connector to align a new room's entrance to
+     * @param candidatePool the room templates to try
+     * @param existingInstances all room instances currently placed
+     * @param sourceRoom the room the exit belongs to, excluded from collision checks
+     * @return a fitting placement, or null if none was found
+     */
+    private static Placement findPlacement(Connector exit, List<RoomTemplate> candidatePool,
+                                           List<RoomInstance> existingInstances, RoomInstance sourceRoom) {
+        // NOTE: entranceConnector.getDirection() is not reliable here — BuildEvents always
+        // constructs entrances with a hardcoded (1,0,0) direction, so it doesn't reflect
+        // which way an entrance actually faces. Room templates instead follow a fixed
+        // convention (entrances face -X locally, pre-rotation), the same convention
+        // nextRoom() relies on via RoomTemplate.rotationToFace(). The required rotation
+        // is therefore a function of the exit alone, not of any per-candidate data, so
+        // it's computed once up front instead of brute-forced per candidate.
+        Vector exitDirRaw = exit.getDirection();
+        Vector3 exitDir = Vector3.at(exitDirRaw.getX(), 0, exitDirRaw.getZ()).normalize();
+        Vector3 requiredEntranceFacing = exitDir.multiply(-1);
+
+        int rotation = RoomTemplate.rotationToFace(requiredEntranceFacing);
+        Transform transform = RoomTemplate.rotationTransform(rotation);
+
+        Vector exitCenter = exit.getCenter();
+        BlockVector3 pasteAt = BlockVector3.at(
+                (int) Math.floor(exitCenter.getX()), (int) Math.floor(exitCenter.getY()), (int) Math.floor(exitCenter.getZ()));
+
+        for (RoomTemplate candidate : candidatePool) {
+            Connector entranceLocal = candidate.entranceConnector;
+            if (entranceLocal == null) continue;
+
+            // Disqualify dead-end candidates: a single exit that would face backward
+            // (after rotation) can never lead anywhere useful, so skip it entirely.
+            if (candidate.exitConnectors.size() == 1) {
+                Vector dirRaw = candidate.exitConnectors.get(0).getDirection();
+                Vector3 exitDirLocal = Vector3.at(dirRaw.getX(), dirRaw.getY(), dirRaw.getZ());
+                Vector3 rotatedExitDir = RoomTemplate.rotateDirection(transform, exitDirLocal).normalize();
+                if (RoomTemplate.isBackwardDirection(rotatedExitDir)) continue;
+            }
+
+            Vector center = entranceLocal.getCenter();
+            BlockVector3 localOrigin = BlockVector3.at(
+                    (int) Math.floor(center.getX()), (int) Math.floor(center.getY()), (int) Math.floor(center.getZ()));
+
+            BoundingBox candidateBox = candidate.computeWorldBounds(transform, localOrigin, pasteAt);
+            candidateBox.expand(1, 1, 1);
+
+            boolean collides = existingInstances.stream()
+                    .filter(inst -> inst != sourceRoom)
+                    .anyMatch(inst -> inst.boundingBox.overlaps(candidateBox));
+            if (collides) continue;
+
+            return new Placement(candidate, rotation, pasteAt);
+        }
+        return null;
+    }
+
+    /**
+     * Finds a fitting template for the given exit and pastes it. Blocks the exit
+     * and returns null if no candidate fits.
+     * @param exit the exit connector to generate a new room from
+     * @param world the world to paste into
+     * @param candidatePool the room templates to try
+     * @param existingInstances all room instances currently placed
+     * @param sourceRoom the room the exit belongs to, excluded from collision checks
+     * @return the newly generated room instance, or null if the exit was sealed
+     */
+    public static RoomInstance generateFromExit(Connector exit, World world,
+                                                List<RoomTemplate> candidatePool,
+                                                List<RoomInstance> existingInstances,
+                                                RoomInstance sourceRoom) {
+        Placement placement = findPlacement(exit, candidatePool, existingInstances, sourceRoom);
+        if (placement == null) {
+            exit.block(world);
+            return null;
+        }
+
+        RoomInstance instance = new RoomInstance(placement.template);
+        Location pasteLoc = new Location(world, placement.pasteAt.x(), placement.pasteAt.y(), placement.pasteAt.z());
+        instance.generate(pasteLoc, placement.rotation);
+        return instance;
+    }
+
+    /**
+     * Checks whether any candidate template could be generated from the given exit
+     * without overlapping an existing room, without actually pasting anything.
+     * @param exit the exit connector to test
+     * @param candidatePool the room templates to try
+     * @param existingInstances all room instances currently placed
+     * @param sourceRoom the room the exit belongs to, excluded from collision checks
+     * @return true if at least one fitting placement exists
+     */
+    public static boolean canGenerateFrom(Connector exit, List<RoomTemplate> candidatePool,
+                                          List<RoomInstance> existingInstances, RoomInstance sourceRoom) {
+        Vector dirRaw = exit.getDirection();
+        if (RoomTemplate.isBackwardDirection(Vector3.at(dirRaw.getX(), dirRaw.getY(), dirRaw.getZ()))) {
+            return false;
+        }
+        return findPlacement(exit, candidatePool, existingInstances, sourceRoom) != null;
     }
 }
