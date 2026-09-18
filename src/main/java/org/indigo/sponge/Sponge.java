@@ -15,12 +15,15 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.WorldCreator;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
+import org.indigo.sponge.block.CustomBlock;
+import org.indigo.sponge.block.CustomBlocks;
 import org.indigo.sponge.functions.Utils;
 import org.indigo.sponge.game.*;
 import org.indigo.sponge.game.rooms.BuildEvents;
@@ -47,6 +50,19 @@ public class Sponge extends JavaPlugin {
         //SlimeWorld loading
         loader = new FileLoader(new File("slime_worlds"));
 
+        CustomBlocks.init();
+        File configFile = new File("config/paper-global.yml");
+        if (!configFile.exists()) return;
+
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
+        config.set("block-updates.disable-noteblock-updates", true);
+
+        try {
+            config.save(configFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         //Initialising commands
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
             commands.registrar().register(CommandHelper.flyspeedCommand().build(),List.of("fs","flightspeed"));
@@ -56,7 +72,7 @@ public class Sponge extends JavaPlugin {
             commands.registrar().register(CommandHelper.rooms());
             commands.registrar().register(CommandHelper.testCommand());
             commands.registrar().register(CommandHelper.pathCommand());
-
+            commands.registrar().register(CommandHelper.blocksCommand());
         });
 
         // Plugin startup logic
@@ -204,4 +220,7 @@ public class Sponge extends JavaPlugin {
     public static List<Vector> pathPoints = new ArrayList<>();
     public static List<Vector> dockPoints = new ArrayList<>();
     public static List<Integer> dockRotations = new ArrayList<>();
+
+    //Custom Block Stuff
+    public static List<CustomBlock> customBlocks = new ArrayList<>();
 }

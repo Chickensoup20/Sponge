@@ -10,13 +10,17 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.MenuType;
 import org.bukkit.util.Vector;
 import org.indigo.sponge.functions.Utils;
 import org.indigo.sponge.game.Game;
 import org.indigo.sponge.game.RoomTemplate;
+import org.indigo.sponge.menus.BlocksMenu;
 
 import java.io.IOException;
 import java.util.List;
@@ -218,6 +222,18 @@ public class CommandHelper {
                 }).build();
 
     }
+    public static LiteralCommandNode<CommandSourceStack> blocksCommand() {
+
+        return Commands.literal("blocks")
+                .executes(ctx -> {
+                    Player player = ctx.getSource().getPlayerOrThrow();
+                    BlocksMenu menu = new BlocksMenu(plugin);
+                    player.openInventory(menu.getInventory());
+                    return Command.SINGLE_SUCCESS;
+                }).build();
+
+    }
+
     public static LiteralCommandNode<CommandSourceStack> pathCommand() {
 
         return Commands.literal("path")

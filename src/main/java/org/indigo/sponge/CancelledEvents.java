@@ -1,10 +1,16 @@
 package org.indigo.sponge;
 
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.block.NotePlayEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExhaustionEvent;
@@ -42,6 +48,10 @@ public class CancelledEvents implements Listener {
     public void onRightClick(PlayerInteractEvent event){
         if(Sponge.players.get(event.getPlayer()).getState() == SpongePlayer.State.LOBBY)
             event.setCancelled(true);
+//        if(event.getClickedBlock().getType() == Material.NOTE_BLOCK) {
+//            event.setCancelled(true);
+//        }
+
     }
 
     @EventHandler
@@ -52,5 +62,18 @@ public class CancelledEvents implements Listener {
     @EventHandler
     public void onDamage(EntityDamageEvent event){
         event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void NotePlayerEvent(NotePlayEvent event){
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBlockPhysics(BlockPhysicsEvent event){
+
+//        if(event.getBlock().getType() == Material.NOTE_BLOCK){
+//            event.setCancelled(true);
+//        }
     }
 }
