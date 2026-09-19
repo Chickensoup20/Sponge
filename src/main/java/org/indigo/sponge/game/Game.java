@@ -8,6 +8,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.Transform;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.GameRules;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -56,6 +57,8 @@ public class Game {
         alivePlayers = players;
         this.floor = floor;
         this.rooms = floor.rooms;
+        currentBranch = new Branch(floor.floorMap);
+        world.setGameRule(GameRules.ADVANCE_TIME,false);
     }
 
     /**
@@ -75,28 +78,36 @@ public class Game {
         if (exit.isBlocked()) return;
 
         RoomInstance sourceRoom = findOwningInstance(exit);
-        RoomNode requiredRoomType = floor.floorMap.get(roomIndex);
+        RoomNode requiredRoomType = currentBranch.getChildren().get(roomIndex);
         List<RoomTemplate> pool = new ArrayList<>();
-        canBranch = false;
-        Bukkit.broadcast(Component.text(requiredRoomType.toString()));
-        if(currentBranch != null){
-            if(currentBranch.getChildren().get(roomIndex) instanceof Branch){
-                canBranch = true;
-            }
-        } else {
-            if(requiredRoomType instanceof Branch){
-                canBranch = true;
-            }
-        }
-
         if(canBranch){
-            Bukkit.broadcast(Component.text("BRANCH!!!"));
-            Bukkit.broadcast(Component.text(branchRooms.getFirst().name));
-            pool = branchRooms;
+            //Currently in a branch making a decision
+            if(newBranch){
+                currentBranch = (Branch) currentBranch.getChildren().get(roomIndex);
+                roomIndex = 0;
+            } else {
+                roomIndex++;
+
+            }
+            newBranch = false;
+            canBranch = false;
+            pool = rooms.get(currentBranch.getChildren().get(roomIndex));
+
         } else {
-            pool = rooms.get(requiredRoomType);
-            roomIndex++;
-        }
+            Bukkit.broadcast(Component.text(requiredRoomType.toString()));
+            if(currentBranch.getChildren().get(roomIndex) instanceof Branch){
+                //Current room is a branch
+                canBranch = true;
+                Bukkit.broadcast(Component.text("BRANCH!!!"));
+                Bukkit.broadcast(Component.text(branchRooms.getFirst().name));
+                pool = branchRooms;
+            } else {
+                //Current room is not a branch
+                pool = rooms.get(requiredRoomType);
+                roomIndex++;
+            }
+
+        }//7739
 
         Collections.shuffle(pool);
         RoomInstance next = RoomInstance.generateFromExit(exit, world, pool, instances, sourceRoom);
@@ -118,6 +129,9 @@ public class Game {
                 nextExit.block(world);
             }
         }
+
+
+
     }
 
     /**

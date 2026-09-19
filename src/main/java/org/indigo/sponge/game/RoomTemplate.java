@@ -21,6 +21,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import org.bukkit.GameRules;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -98,6 +99,7 @@ public class RoomTemplate {
         this.worldInstance = asp.loadWorld(slimeWorld, false);
 
         world = worldInstance.getBukkitWorld();
+        world.setGameRule(GameRules.ADVANCE_TIME,false);
         localBounds = new BoundingBox(0,0,0,0,0,0);
         for (int x = 0; x < 500; x++) {
             for (int z = 0; z < 500; z++) {
@@ -216,6 +218,7 @@ public class RoomTemplate {
         room.slimeWorld = asp.readWorld(loader, room.name, false, new SlimePropertyMap());
         room.worldInstance = asp.loadWorld(room.slimeWorld, true);
         room.world = room.worldInstance.getBukkitWorld();
+        room.world.setGameRule(GameRules.ADVANCE_TIME,false);
         room.rebuildBounds();
         floors.get(room.floorName).addRoom(room);
         allRooms.put(room.name, room);

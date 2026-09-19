@@ -16,16 +16,9 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExhaustionEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.weather.WeatherChangeEvent;
 
 public class CancelledEvents implements Listener {
-
-
-//    @EventHandler (priority = EventPriority.HIGHEST)
-//    public void onBlockPhysics(BlockPhysicsEvent event) {
-//
-//        event.setCancelled(true);
-//        event.getBlock().setBlockData(event.getBlock().getBlockData(),false);
-//    }
 
     @EventHandler
     public void onEntitySpawn(EntitySpawnEvent event) {
@@ -48,9 +41,6 @@ public class CancelledEvents implements Listener {
     public void onRightClick(PlayerInteractEvent event){
         if(Sponge.players.get(event.getPlayer()).getState() == SpongePlayer.State.LOBBY)
             event.setCancelled(true);
-//        if(event.getClickedBlock().getType() == Material.NOTE_BLOCK) {
-//            event.setCancelled(true);
-//        }
 
     }
 
@@ -69,11 +59,8 @@ public class CancelledEvents implements Listener {
         event.setCancelled(true);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBlockPhysics(BlockPhysicsEvent event){
-
-//        if(event.getBlock().getType() == Material.NOTE_BLOCK){
-//            event.setCancelled(true);
-//        }
+    @EventHandler
+    public void weatherEvent(WeatherChangeEvent event){
+        event.setCancelled(true);
     }
 }

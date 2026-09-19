@@ -12,9 +12,7 @@ import com.infernalsuite.asp.api.loaders.SlimeLoader;
 import com.infernalsuite.asp.loaders.file.FileLoader;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.WorldCreator;
+import org.bukkit.*;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
@@ -96,7 +94,7 @@ public class Sponge extends JavaPlugin {
         InitAll.makeConsumables();
 
         //Creating Floors
-        Floor floor1 = new Floor("sponge",1,List.of(RoomTemplate.RoomType.NORMAL,new Branch(List.of(RoomTemplate.RoomType.BOSS))));
+        Floor floor1 = new Floor("sponge",1,List.of(RoomTemplate.RoomType.NORMAL,new Branch(List.of(RoomTemplate.RoomType.BOSS)),RoomTemplate.RoomType.BOSS));
 
         //Loading rooms from files
         Path roomsDir = Path.of("room_templates");
@@ -134,6 +132,9 @@ public class Sponge extends JavaPlugin {
             throw new RuntimeException(e);
         }
 
+        for(World world : Bukkit.getWorlds()){
+            world.setGameRule(GameRules.ADVANCE_TIME,false);
+        }
     }
 
     public static ItemStack entranceWand = Utils.createItem(Material.BLAZE_ROD,Colors.toMM(Colors.ORANGE_LIGHT) + "Entrance Wand","entrancewand");
@@ -220,7 +221,4 @@ public class Sponge extends JavaPlugin {
     public static List<Vector> pathPoints = new ArrayList<>();
     public static List<Vector> dockPoints = new ArrayList<>();
     public static List<Integer> dockRotations = new ArrayList<>();
-
-    //Custom Block Stuff
-    public static List<CustomBlock> customBlocks = new ArrayList<>();
 }

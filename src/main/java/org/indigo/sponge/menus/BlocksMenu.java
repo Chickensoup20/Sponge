@@ -11,7 +11,6 @@ public class BlocksMenu implements InventoryHolder {
     private final Inventory inventory;
 
     public BlocksMenu(Plugin plugin) {
-        // Create an Inventory with 9 slots, `this` here is our InventoryHolder.
         this.inventory = plugin.getServer().createInventory(this, 9);
         for(CustomBlock block : CustomBlock.customBlocks){
             inventory.addItem(block.getItem());
