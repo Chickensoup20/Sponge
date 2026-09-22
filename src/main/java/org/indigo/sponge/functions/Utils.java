@@ -10,6 +10,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.indigo.sponge.Colors;
 import org.indigo.sponge.Sponge;
+import org.indigo.sponge.registries.Items;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,7 +51,7 @@ public class Utils {
             allStats.put(stats.get(i), values.get(i));
         }
 
-        Sponge.itemStatDic.put(id, allStats);
+        Items.itemStatDic.put(id, allStats);
     }
 
     public static String translateStats(String type, String stat, Object value)

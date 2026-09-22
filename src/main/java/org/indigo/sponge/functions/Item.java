@@ -13,6 +13,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.indigo.sponge.Sponge;
+import org.indigo.sponge.registries.Items;
 import org.w3c.dom.Text;
 
 import java.nio.channels.Selector;
@@ -68,9 +69,9 @@ public class Item {
         {
             meta.setTooltipStyle(new NamespacedKey("minecraft", "kitty"));
         }
-        if (Sponge.itemStatDic.containsKey(id))
+        if (Items.itemStatDic.containsKey(id))
         {
-            HashMap<String,Double> itemStats =  Sponge.itemStatDic.get(id);
+            HashMap<String,Double> itemStats =  Items.itemStatDic.get(id);
             for (Map.Entry<String, Double> entry : itemStats.entrySet()) {
                 String stat = entry.getKey();
                 Double statValue = entry.getValue();
@@ -98,9 +99,9 @@ public class Item {
         item.setItemMeta(meta);
         if (floorlevel == 0)
         {
-            Sponge.floorAllItems.put(id, item);
+            Items.floorAllItems.put(id, item);
         }
-        Sponge.itemDic.put(id, item);
+        Items.itemDic.put(id, item);
     }
     public static void createArmor(String id, ItemStack item, String name, String desc, Double value, String subCategory, Integer floorlevel, Double armor) {
         String category = "armor-" + subCategory;
@@ -135,9 +136,9 @@ public class Item {
             meta.setTooltipStyle(new NamespacedKey("minecraft", "magic"));
             loreColor = "#7800FF";
         }
-        if (Sponge.itemStatDic.containsKey(id))
+        if (Items.itemStatDic.containsKey(id))
         {
-            HashMap<String,Double> itemStats =  Sponge.itemStatDic.get(id);
+            HashMap<String,Double> itemStats =  Items.itemStatDic.get(id);
             for (Map.Entry<String, Double> entry : itemStats.entrySet()) {
                 String stat = entry.getKey();
                 Double statValue = entry.getValue();
@@ -165,9 +166,9 @@ public class Item {
         item.setItemMeta(meta);
         if (floorlevel == 0)
         {
-            Sponge.floorAllItems.put(id, item);
+            Items.floorAllItems.put(id, item);
         }
-        Sponge.itemDic.put(id, item);
+        Items.itemDic.put(id, item);
     }
     public static void createAccessory(String id, ItemStack item, String name, String desc, Double value, Integer floorlevel) {
         ItemMeta meta = item.getItemMeta();
@@ -177,9 +178,9 @@ public class Item {
         List<Component> loreList = new ArrayList<>(List.of(MiniMessage.miniMessage().deserialize(" <dark_gray><!i>Accessory"), Component.text("")));
         List<Component> loreLineList;
 
-        if (Sponge.itemStatDic.containsKey(id))
+        if (Items.itemStatDic.containsKey(id))
         {
-            HashMap<String,Double> itemStats =  Sponge.itemStatDic.get(id);
+            HashMap<String,Double> itemStats =  Items.itemStatDic.get(id);
             for (Map.Entry<String, Double> entry : itemStats.entrySet()) {
                 String stat = entry.getKey();
                 Double statValue = entry.getValue();
@@ -208,9 +209,9 @@ public class Item {
         item.setItemMeta(meta);
         if (floorlevel == 0)
         {
-            Sponge.floorAllItems.put(id, item);
+            Items.floorAllItems.put(id, item);
         }
-        Sponge.itemDic.put(id, item);
+        Items.itemDic.put(id, item);
     }
     public static void createConsumable(String id, ItemStack item, String name, String desc, Double value, String subCategory, Integer floorlevel) {
         List<String> cats = List.of("food", "throwable");
@@ -228,8 +229,8 @@ public class Item {
         List<Component> loreList = new ArrayList<>(List.of(MiniMessage.miniMessage().deserialize(" <dark_gray><!i>" + subCategory), Component.text("")));
         List<Component> loreLineList;
 
-        if (Sponge.itemStatDic.containsKey(id)) {
-            HashMap<String, Double> itemStats = Sponge.itemStatDic.get(id);
+        if (Items.itemStatDic.containsKey(id)) {
+            HashMap<String, Double> itemStats = Items.itemStatDic.get(id);
             for (Map.Entry<String, Double> entry : itemStats.entrySet()) {
                 String stat = entry.getKey();
                 Double statValue = entry.getValue();
@@ -262,9 +263,9 @@ public class Item {
         item.setItemMeta(meta);
         if (floorlevel == 0)
         {
-            Sponge.floorAllItems.put(id, item);
+            Items.floorAllItems.put(id, item);
         }
-        Sponge.itemDic.put(id, item);
+        Items.itemDic.put(id, item);
     }
     public static void itemGlow(UUID uuid, ItemStack item)
     {
