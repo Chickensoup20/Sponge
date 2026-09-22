@@ -17,6 +17,7 @@ import org.bukkit.event.entity.EntityExhaustionEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
+import org.indigo.sponge.registries.Players;
 
 public class CancelledEvents implements Listener {
 
@@ -39,7 +40,8 @@ public class CancelledEvents implements Listener {
 
     @EventHandler
     public void onRightClick(PlayerInteractEvent event){
-        if(Sponge.players.get(event.getPlayer()).getState() == SpongePlayer.State.LOBBY)
+        SpongePlayer session = Players.find(event.getPlayer());
+        if (session != null && session.getState() == SpongePlayer.State.LOBBY)
             event.setCancelled(true);
 
     }

@@ -5,11 +5,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.indigo.sponge.functions.Item;
+import org.indigo.sponge.game.Game;
+import org.indigo.sponge.registries.Games;
+import org.indigo.sponge.registries.Items;
+import org.indigo.sponge.registries.Players;
 
 import java.util.UUID;
 
@@ -17,51 +22,45 @@ public class GameEvents implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        SpongePlayer spongePlayer = new SpongePlayer(player, SpongePlayer.State.LOBBY);
-        spongePlayer.applyState(SpongePlayer.State.LOBBY);
-//        if (!Sponge.gameLoaded)
-//        {
-//            AttributeInstance att = player.getAttribute(Attribute.MOVEMENT_SPEED);
-//            att.setBaseValue(0);
-//            AttributeInstance att2 = player.getAttribute(Attribute.JUMP_STRENGTH);
-//            att2.setBaseValue(0);
-//            new BukkitRunnable() {
-//                @Override
-//                public void run() {
-//                    player.showTitle(Title.title(MiniMessage.miniMessage().deserialize("<white><b>GAME LOADING"), MiniMessage.miniMessage().deserialize("<gray><i>please wait..."),0,20,5));
-//                    player.addPotionEffect(PotionEffectType.BLINDNESS.createEffect(-1, 1));
-//                    if(Sponge.gameLoaded) {
-//                        player.showTitle(Title.title(MiniMessage.miniMessage().deserialize("<green>✔ <b>DONE <!b>✔"), MiniMessage.miniMessage().deserialize(""),2,20,5));
-//                        player.clearActivePotionEffects();
-//                        att.setBaseValue(0.1);
-//                        att2.setBaseValue(Attribute.JUMP_STRENGTH.getDefaultValue());
-//                        cancel();
-//                    }
-//                }
-//            }.runTaskTimer(Sponge.plugin, 1, 1);
-//        }
-        Sponge.gameLoaded = true;
+        SpongePlayer session = Players.find(player);
+        if (session == null) {
+            session = new SpongePlayer(player, SpongePlayer.State.LOBBY);
+            Players.register(session);
+        } else {
+            session.attach(player);
+        }
+        session.applyState(SpongePlayer.State.LOBBY);
+
+        Games.gameLoaded = true;
 
         player.addResourcePack(UUID.randomUUID(),"https://github.com/Kr4sty/Sponge_Resourcepack/raw/refs/heads/master/Sponge.zip",null,"Download me please",true);
 
-        if (!Sponge.joinedPlayers.contains(player))
-        {
-            Sponge.joinedPlayers.add(player);
-            player.setCollidable(false);
-            player.setAllowFlight(false);
-        }
+        player.setCollidable(false);
+        player.setAllowFlight(false);
     }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        for (Game game : Games.runningGames) {
+            game.alivePlayers.remove(player);
+        }
+        Players.remove(player.getUniqueId());
+    }
+
     @EventHandler
     public void onSneak(PlayerToggleSneakEvent event) {
-        if(Sponge.players.get(event.getPlayer()).getState() == SpongePlayer.State.LOBBY) {
-            Player player = event.getPlayer();
-            Sponge.gameLoaded = true;
-            player.give(Sponge.itemDic.get("test"));
-            player.give(Sponge.itemDic.get("trainingSword"));
-            player.give(Sponge.itemDic.get("leatherHelmet"));
-            player.give(Sponge.itemDic.get("razorBlade"));
-            player.give(Sponge.itemDic.get("chickenLeg"));
+        SpongePlayer session = Players.find(event.getPlayer());
+        if (session == null || session.getState() != SpongePlayer.State.LOBBY) {
+            return;
         }
+        Player player = event.getPlayer();
+        Games.gameLoaded = true;
+        player.give(Items.itemDic.get("test"));
+        player.give(Items.itemDic.get("trainingSword"));
+        player.give(Items.itemDic.get("leatherHelmet"));
+        player.give(Items.itemDic.get("razorBlade"));
+        player.give(Items.itemDic.get("chickenLeg"));
     }
 
     @EventHandler
