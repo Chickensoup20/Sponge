@@ -29,6 +29,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 import org.indigo.sponge.Sponge;
 import org.indigo.sponge.game.rooms.Connector;
+import org.indigo.sponge.registries.FloorRegistry;
+import org.indigo.sponge.registries.RoomRegistry;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -46,7 +48,8 @@ public class RoomTemplate {
         HARD,
         SECRET,
         BOSS,
-        BRANCH
+        BRANCH,
+        INTRO
     }
 
     public String name;
@@ -92,8 +95,8 @@ public class RoomTemplate {
         this.name = name;
 
         this.floorName = floorName;
-        floors.get(floorName).addRoom(this);
-        allRooms.put(name,this);
+        FloorRegistry.get(floorName).addRoom(this);
+        RoomRegistry.register(this);
 
         slimeWorld = asp.createEmptyWorld(name, false, new SlimePropertyMap(), loader);
         this.worldInstance = asp.loadWorld(slimeWorld, false);
@@ -107,9 +110,6 @@ public class RoomTemplate {
             }
         }
 
-        if (roomType == RoomType.BRANCH){
-            branchRooms.add(this);
-        }
     }
 
     /**
@@ -220,13 +220,9 @@ public class RoomTemplate {
         room.world = room.worldInstance.getBukkitWorld();
         room.world.setGameRule(GameRules.ADVANCE_TIME,false);
         room.rebuildBounds();
-        floors.get(room.floorName).addRoom(room);
-        allRooms.put(room.name, room);
+        FloorRegistry.get(room.floorName).addRoom(room);
         for (Connector c : room.exitConnectors) c.rebuild(room.world);
         if (room.entranceConnector != null) room.entranceConnector.rebuild(room.world);
-        if (room.roomType == RoomType.BRANCH){
-            branchRooms.add(room);
-        }
         return room;
     }
 

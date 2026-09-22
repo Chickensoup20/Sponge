@@ -7,7 +7,19 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Floor {
-    private String floorName;
+    public List<RoomTemplate> getAllRooms() {
+        return allRooms;
+    }
+
+    public int getFloorLevel() {
+        return floorLevel;
+    }
+
+    public String getFloorName() {
+        return name;
+    }
+
+    private String name;
     private int floorLevel;
     private List<RoomTemplate> allRooms = new ArrayList<>();
     public HashMap<RoomTemplate.RoomType, List<RoomTemplate>> rooms = new HashMap<>();
@@ -22,9 +34,8 @@ public class Floor {
      */
     public Floor(String floorName, int floorLevel, List<RoomNode> floorMap){
         this.floorLevel = floorLevel;
-        this.floorName = floorName;
+        this.name = floorName;
         this.floorMap = floorMap;
-        Sponge.floors.put(floorName,this);
         for(RoomTemplate.RoomType roomType : RoomTemplate.RoomType.values()){
             rooms.put(roomType,new ArrayList<>());
         }
