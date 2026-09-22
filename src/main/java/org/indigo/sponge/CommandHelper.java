@@ -21,6 +21,10 @@ import org.indigo.sponge.functions.Utils;
 import org.indigo.sponge.game.Game;
 import org.indigo.sponge.game.RoomTemplate;
 import org.indigo.sponge.menus.BlocksMenu;
+import org.indigo.sponge.registries.FloorRegistry;
+import org.indigo.sponge.registries.Items;
+import org.indigo.sponge.registries.Players;
+import org.indigo.sponge.registries.RoomRegistry;
 
 import java.io.IOException;
 import java.util.List;
@@ -49,7 +53,7 @@ public class CommandHelper {
                 .requires(sender -> sender.getSender().hasPermission("permission.dev"))
                 .executes(ctx -> {
                     Player player = ctx.getSource().getPlayerOrThrow();
-                    Sponge.players.get(player).applyState(SpongePlayer.State.DEV);
+                    Players.get(player).applyState(SpongePlayer.State.DEV);
                     Utils.sendSystemMessage(player, "You are now in dev mode.");
                     return Command.SINGLE_SUCCESS;
                 }).build();
@@ -61,7 +65,7 @@ public class CommandHelper {
         return Commands.literal("lobby")
                 .executes(ctx -> {
                     Player player = ctx.getSource().getPlayerOrThrow();
-                    Sponge.players.get(player).applyState(SpongePlayer.State.LOBBY);
+                    Players.get(player).applyState(SpongePlayer.State.LOBBY);
                     Utils.sendSystemMessage(player, "You are now in the lobby.");
                     return Command.SINGLE_SUCCESS;
                 }).build();
@@ -76,7 +80,7 @@ public class CommandHelper {
                         .suggests(CommandHelper::getItemSuggestions)
                         .executes(ctx -> {
                             Player player = ctx.getSource().getPlayerOrThrow();
-                            player.give(Sponge.itemDic.get(StringArgumentType.getString(ctx, "item")));
+                            player.give(Items.itemDic.get(StringArgumentType.getString(ctx, "item")));
                             Utils.sendSystemMessage(player, "You have been given " + StringArgumentType.getString(ctx, "item"));
                             return Command.SINGLE_SUCCESS;
                         })).build();
@@ -85,7 +89,7 @@ public class CommandHelper {
 
     private static CompletableFuture<Suggestions> getItemSuggestions(final CommandContext<CommandSourceStack> ctx, final SuggestionsBuilder builder) {
         // Suggest 1, 16, 32, and 64 to the user when they reach the 'amount' argument
-        for (String itemID : Sponge.itemDic.keySet()) {
+        for (String itemID : Items.itemDic.keySet()) {
             builder.suggest(itemID);
         }
         return builder.buildFuture();
@@ -96,7 +100,7 @@ public class CommandHelper {
         return Commands.literal("rooms")
             .requires(sender -> sender.getSender().hasPermission("permission.dev"))
                 .executes(ctx -> {
-                    for(RoomTemplate room : allRooms.values()){
+                    for(RoomTemplate room : RoomRegistry.all()){
                         ctx.getSource().getPlayerOrThrow().sendMessage("Room name: " + room.name + ", " + room.roomType);
                     }
                     return Command.SINGLE_SUCCESS;
@@ -113,7 +117,7 @@ public class CommandHelper {
                             .executes(ctx -> {
                             RoomTemplate room = new RoomTemplate(StringArgumentType.getString(ctx,"name"), "sponge", RoomTemplate.RoomType.valueOf(StringArgumentType.getString(ctx,"type")));
                             room.tpToWorld(ctx.getSource().getPlayerOrThrow());
-                            players.get(ctx.getSource().getPlayerOrThrow()).setBuilding(room);
+                            Players.get(ctx.getSource().getPlayerOrThrow()).setBuilding(room);
                             return Command.SINGLE_SUCCESS;
                         }))
                     )
@@ -121,14 +125,14 @@ public class CommandHelper {
                 .then(Commands.literal("goto")
                         .then(Commands.argument("Room Name", StringArgumentType.word())
                                 .suggests(((context, builder) -> {
-                                    for (String room : allRooms.keySet())
-                                        builder.suggest(room);
+                                    for (RoomTemplate room : RoomRegistry.all())
+                                        builder.suggest(room.name);
                                     return builder.buildFuture();
                                 }))
                                 .executes(ctx -> {
-                                    RoomTemplate room = allRooms.get(StringArgumentType.getString(ctx, "Room Name"));
+                                    RoomTemplate room = RoomRegistry.get(StringArgumentType.getString(ctx, "Room Name"));
                                     room.tpToWorld(ctx.getSource().getPlayerOrThrow());
-                                    players.get(ctx.getSource().getPlayerOrThrow()).setBuilding(room);
+                                    Players.get(ctx.getSource().getPlayerOrThrow()).setBuilding(room);
                                     return Command.SINGLE_SUCCESS;
                                 })
                         )
@@ -136,14 +140,14 @@ public class CommandHelper {
                 .then(Commands.literal("save")
                         .then(Commands.argument("name", StringArgumentType.word())
                             .suggests(((context, builder) -> {
-                                for (String room : allRooms.keySet())
-                                    builder.suggest(room);
+                                for (RoomTemplate room : RoomRegistry.all())
+                                    builder.suggest(room.name);
                                 return builder.buildFuture();
                             }))
                             .executes(ctx -> {
 
                                 try {
-                                    allRooms.get(StringArgumentType.getString(ctx,"name")).updateBounds();
+                                    RoomRegistry.get(StringArgumentType.getString(ctx,"name")).updateBounds();
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
                                 }
@@ -154,56 +158,11 @@ public class CommandHelper {
                 .then(Commands.literal("tools")
                         .executes(ctx -> {
 
-                            ctx.getSource().getPlayerOrThrow().give(entranceWand,exitWand);
+                            ctx.getSource().getPlayerOrThrow().give(Items.entranceWand, Items.exitWand);
 
                             return Command.SINGLE_SUCCESS;
                         })
                 )
-//                .then(Commands.literal("info")
-//                        .then(Commands.argument("room", StringArgumentType.word())
-//                                .suggests(((context, builder) -> {
-//                                    for (String room : rooms.keySet())
-//                                        builder.suggest(room);
-//                                    return builder.buildFuture();
-//                                }))
-//                                .executes(ctx -> {
-//                                    Room room = rooms.get(StringArgumentType.getString(ctx,"room"));
-//                                    Player player = ctx.getSource().getPlayerOrThrow();
-//                                    player.sendMessage(room.getName() + "info:");
-//                                    player.sendMessage("Floor: " + room.getFloor());
-//                                    player.sendMessage("Room Type: " + room.getRoomType());
-//                                    return Command.SINGLE_SUCCESS;
-//                                })
-//                                .then(Commands.literal("name")
-//                                    .then(Commands.argument("name", StringArgumentType.word())
-//                                            .executes(ctx -> {
-//                                                rooms.get(StringArgumentType.getString(ctx,"room")).setName(StringArgumentType.getString(ctx,"name"));
-//                                                return Command.SINGLE_SUCCESS;
-//                                            })
-//                                    )
-//                                )
-//                                .then(Commands.literal("floor")
-//                                        .then(Commands.argument("floor", StringArgumentType.word())
-//                                        .executes(ctx -> {
-//                                            rooms.get(StringArgumentType.getString(ctx,"room")).setFloor(StringArgumentType.getString(ctx,"floor"));
-//                                            return Command.SINGLE_SUCCESS;
-//                                        })
-//                                ))
-//                                .then(Commands.literal("type")
-//                                        .then(Commands.argument("type", StringArgumentType.word())
-//                                            .suggests(((context, builder) -> {
-//                                                for (RoomType type : RoomType.values())
-//                                                    builder.suggest(type.toString());
-//                                                return builder.buildFuture();
-//                                            }))
-//                                        .executes(ctx -> {
-//                                            rooms.get(StringArgumentType.getString(ctx,"room")).setRoomType(RoomType.valueOf(StringArgumentType.getString(ctx,"type")));
-//                                            return Command.SINGLE_SUCCESS;
-//                                        })
-//                                ))
-//
-//                        )
-//                )
 
 
                 .build();
@@ -215,7 +174,7 @@ public class CommandHelper {
         return Commands.literal("test")
                 .executes(ctx -> {
                     Player player = ctx.getSource().getPlayerOrThrow();
-                    Game game = new Game(List.of(player),floors.get("sponge"));
+                    Game game = new Game(List.of(player), FloorRegistry.get("sponge"));
                     game.start();
 
                     return Command.SINGLE_SUCCESS;
@@ -231,48 +190,6 @@ public class CommandHelper {
                     player.openInventory(menu.getInventory());
                     return Command.SINGLE_SUCCESS;
                 }).build();
-
-    }
-
-    public static LiteralCommandNode<CommandSourceStack> pathCommand() {
-
-        return Commands.literal("path")
-                .then(Commands.literal("dock")
-                        .executes(ctx -> {
-                            dockPoints.add(ctx.getSource().getPlayerOrThrow().getEyeLocation().toVector());
-                            dockRotations.add((int) (Math.round(ctx.getSource().getPlayerOrThrow().getYaw() / 90.0) * 90));
-                            return Command.SINGLE_SUCCESS;
-                        })
-                )
-                .then(Commands.literal("point")
-                        .executes(ctx -> {
-
-                            pathPoints.add(ctx.getSource().getPlayerOrThrow().getEyeLocation().toVector());
-
-                            return Command.SINGLE_SUCCESS;
-                        })
-                ).then(Commands.literal("test")
-                        .executes(ctx -> {
-                            Player player = ctx.getSource().getPlayerOrThrow();
-
-                            Vector startVec = (Vector) dockPoints.getFirst();
-                            Vector endVec = (Vector) dockPoints.getLast();
-
-                            Vector direction = endVec.clone().subtract(startVec);
-                            double distance = direction.length();
-                            direction.normalize();
-
-                            for (double i = 0; i < distance; i += 0.5) {
-                                Vector point = startVec.clone().add(direction.clone().multiply(i));
-                                Location loc = point.toLocation(player.getWorld());
-
-                                // do something at this location, e.g. spawn a particle
-                                loc.getWorld().spawnParticle(Particle.FLAME, loc, 1);
-                            }
-                            return Command.SINGLE_SUCCESS;
-                        })
-                ).build();
-
 
     }
 
