@@ -1,4 +1,6 @@
-package org.indigo.sponge.block;
+package org.indigo.sponge.registries;
+
+import org.indigo.sponge.block.CustomBlock;
 
 public class CustomBlocks {
     public static void init(){}
