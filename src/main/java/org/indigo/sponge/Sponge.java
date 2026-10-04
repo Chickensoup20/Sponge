@@ -87,7 +87,7 @@ public class Sponge extends JavaPlugin {
             world.setGameRule(GameRules.ADVANCE_TIME,false);
         }
         FloorRegistry.init(new FloorRegistry());
-        FloorRegistry.register(new Floor("sponge", 1, List.of(RoomTemplate.RoomType.NORMAL, new Branch(List.of(RoomTemplate.RoomType.BOSS)), RoomTemplate.RoomType.BOSS)));
+        FloorRegistry.register(new Floor("sponge", 1, List.of(RoomTemplate.RoomType.NORMAL, new Branch(List.of(RoomTemplate.RoomType.NORMAL,RoomTemplate.RoomType.BOSS)), RoomTemplate.RoomType.BOSS)));
         RoomRegistry.init(new RoomRegistry());
         RoomRegistry.loadRooms();
     }

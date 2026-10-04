@@ -39,11 +39,6 @@ public class Game {
     public boolean newBranch = false;
     public boolean canBranch = false;
 
-    /**
-     * Starts a new game instance for the given players: creates a dedicated
-     * SlimeWorld and pastes the starting "test" room at the origin.
-     * @param players the players participating in this game
-     */
     public Game(List<Player> players, Floor floor){
         this.players = players;
         this.uuid = UUID.randomUUID();
@@ -65,9 +60,6 @@ public class Game {
         world.setGameRule(GameRules.ADVANCE_TIME,false);
     }
 
-    /**
-     * Teleports all players in this game to the starting room.
-     */
     public void start() {
         for (Player player : players) {
             Players.get(player).applyState(SpongePlayer.State.INGAME);
@@ -100,59 +92,32 @@ public class Game {
         }
     }
 
-    /**
-     * Attempts to generate a new room from the given exit by searching all known
-     * room templates for one that fits without overlapping existing rooms.
-     * @param exit the exit connector to expand from
-     */
     public void expandFrom(Connector exit) {
         if (exit.isBlocked()) return;
 
-        if(roomIndex >= floor.floorMap.size()){
+        if(roomIndex >= currentBranch.getChildren().size()){
             for(Player player : players){
                 Players.get(player).applyState(SpongePlayer.State.LOBBY);
             }
+            return;
         }
         RoomInstance sourceRoom = findOwningInstance(exit);
         RoomNode requiredRoomType = currentBranch.getChildren().get(roomIndex);
-        List<RoomTemplate> pool = new ArrayList<>();
-        if(canBranch){
-            //Currently in a branch making a decision
-            if(newBranch){
-                currentBranch = (Branch) currentBranch.getChildren().get(roomIndex);
-                roomIndex = 0;
-            } else {
-                roomIndex++;
 
-            }
-            newBranch = false;
-            canBranch = false;
-            pool = rooms.get(currentBranch.getChildren().get(roomIndex));
+        List<RoomTemplate> pool = chooseNextRoomPool(requiredRoomType);
 
-        } else {
-            Bukkit.broadcast(Component.text(requiredRoomType.toString()));
-            if(currentBranch.getChildren().get(roomIndex) instanceof Branch){
-                //Current room is a branch
-                canBranch = true;
-                Bukkit.broadcast(Component.text("BRANCH!!!"));
-                List<RoomTemplate> branchPool = new ArrayList<>(RoomRegistry.all(RoomTemplate.RoomType.BRANCH));
-                Bukkit.broadcast(Component.text(branchPool.getFirst().name));
-                pool = branchPool;
-            } else {
-                //Current room is not a branch
-                pool = rooms.get(requiredRoomType);
-                roomIndex++;
-            }
-
-        }//7739
-
-        Collections.shuffle(pool);
         RoomInstance next = RoomInstance.generateFromExit(exit, world, pool, instances, sourceRoom);
         if (next == null) return;
 
         roomBoxes.add(next.boundingBox);
         instances.add(next);
 
+        blockOffExits(sourceRoom,next,exit,pool);
+
+        teleportPlayersToSpawningPoints(next);
+    }
+
+    private void blockOffExits(RoomInstance sourceRoom, RoomInstance nextRoom, Connector exit, List<RoomTemplate> pool){
         if (sourceRoom != null) {
             for (Connector otherExit : sourceRoom.exits) {
                 if (otherExit != exit && !otherExit.isBlocked()) {
@@ -161,20 +126,52 @@ public class Game {
             }
         }
 
-        for (Connector nextExit : next.exits) {
-            if (!RoomInstance.canGenerateFrom(nextExit, pool, instances, next)) {
+        for (Connector nextExit : nextRoom.exits) {
+            if (!RoomInstance.canGenerateFrom(nextExit, pool, instances, nextRoom)) {
                 nextExit.block(world);
             }
         }
-
-        teleportPlayersToSpawningPoints(next);
     }
 
-    /**
-     * Finds the room instance that owns the given connector (as an exit or entrance).
-     * @param exit the connector to locate
-     * @return the owning room instance, or null if not found
-     */
+    private List<RoomTemplate> chooseNextRoomPool(RoomNode requiredRoomType){
+        List<RoomTemplate> pool = new ArrayList<>();
+        Bukkit.broadcast(Component.text("Room index: " + roomIndex));
+        newBranch = true;
+        if(canBranch){
+            //Currently in a branch making a decision
+            Bukkit.broadcast(Component.text("Currently in a branch making a decision"));
+            if(newBranch){
+                currentBranch = (Branch) currentBranch.getChildren().get(roomIndex);
+                roomIndex = 0;
+                Bukkit.broadcast(Component.text("Decision made: Entered a new branch"));
+            } else {
+                roomIndex++;
+                Bukkit.broadcast(Component.text("Decision made: Continue on current branch"));
+            }
+            Bukkit.broadcast(Component.text("Generating new room: " + currentBranch.getChildren().get(roomIndex)));
+            newBranch = false;
+            canBranch = false;
+            pool = rooms.get(currentBranch.getChildren().get(roomIndex));
+
+        } else {
+            Bukkit.broadcast(Component.text("Continuing on current branch"));
+            Bukkit.broadcast(Component.text("Generating new room: " + currentBranch.getChildren().get(roomIndex)));
+            if(currentBranch.getChildren().get(roomIndex) instanceof Branch){
+                //Current room is a branch
+                canBranch = true;
+                pool = new ArrayList<>(RoomRegistry.all(RoomTemplate.RoomType.BRANCH));
+            } else {
+                //Current room is not a branch
+                pool = rooms.get(requiredRoomType);
+                roomIndex++;
+            }
+
+
+        }
+        Collections.shuffle(pool);
+        return pool;
+    }
+
     private RoomInstance findOwningInstance(Connector exit) {
         for (RoomInstance instance : instances) {
             if (instance.exits.contains(exit) || instance.entrance == exit) {
