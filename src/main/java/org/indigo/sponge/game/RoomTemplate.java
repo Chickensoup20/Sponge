@@ -21,24 +21,24 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import org.bukkit.GameRules;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
+import org.bukkit.util.Vector;
 import org.indigo.sponge.Sponge;
 import org.indigo.sponge.game.rooms.Connector;
 import org.indigo.sponge.registries.FloorRegistry;
 import org.indigo.sponge.registries.RoomRegistry;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.indigo.sponge.Sponge.*;
 
@@ -69,7 +69,8 @@ public class RoomTemplate {
 
     private static final Gson GSON = new GsonBuilder()
             .setExclusionStrategies(new ExclusionStrategy() {
-                @Override public boolean shouldSkipClass(Class<?> c) {
+                @Override
+                public boolean shouldSkipClass(Class<?> c) {
                     String n = c.getName();
                     return n.startsWith("org.bukkit.craftbukkit")
                             || n.startsWith("net.minecraft")
@@ -78,7 +79,11 @@ public class RoomTemplate {
                             || org.bukkit.Location.class.isAssignableFrom(c)
                             || com.infernalsuite.asp.api.world.SlimeWorld.class.isAssignableFrom(c);
                 }
-                @Override public boolean shouldSkipField(FieldAttributes f) { return false; }
+
+                @Override
+                public boolean shouldSkipField(FieldAttributes f) {
+                    return false;
+                }
             })
             .setPrettyPrinting()
             .create();
@@ -86,11 +91,12 @@ public class RoomTemplate {
     /**
      * Creates a new room template: registers it under the given floor, creates a
      * fresh SlimeWorld for it, and lays down a bedrock floor to build on.
-     * @param name unique name identifying this room template
+     *
+     * @param name      unique name identifying this room template
      * @param floorName name of the floor this room belongs to
-     * @param roomType difficulty/category of this room
+     * @param roomType  difficulty/category of this room
      */
-    public RoomTemplate(String name, String floorName, RoomType roomType){
+    public RoomTemplate(String name, String floorName, RoomType roomType) {
         this.roomType = roomType;
         this.name = name;
 
@@ -102,8 +108,8 @@ public class RoomTemplate {
         this.worldInstance = asp.loadWorld(slimeWorld, false);
 
         world = worldInstance.getBukkitWorld();
-        world.setGameRule(GameRules.ADVANCE_TIME,false);
-        localBounds = new BoundingBox(0,0,0,0,0,0);
+        world.setGameRule(GameRules.ADVANCE_TIME, false);
+        localBounds = new BoundingBox(0, 0, 0, 0, 0, 0);
         for (int x = 0; x < 500; x++) {
             for (int z = 0; z < 500; z++) {
                 new Location(world, x, 50, z).getBlock().setType(Material.BEDROCK);
@@ -121,8 +127,8 @@ public class RoomTemplate {
     /**
      * Removes the display entities for this room's entrance and all exits.
      */
-    public void unload(){
-        for(Connector exit : exitConnectors){
+    public void unload() {
+        for (Connector exit : exitConnectors) {
             exit.removeDisplayEntity();
         }
         entranceConnector.removeDisplayEntity();
@@ -139,6 +145,7 @@ public class RoomTemplate {
 
     /**
      * Teleports a player into this room's build world and shows its connector displays.
+     *
      * @param player the player to teleport
      */
     public void tpToWorld(Player player) {
@@ -146,53 +153,110 @@ public class RoomTemplate {
         spawnDisplays();
     }
 
-    /**
-     * Scans this room's build world for the extent of placed blocks, updates the
-     * template's local bounds, and exports the room as a schematic file.
-     * @throws IOException if writing the schematic file fails
-     */
-    public void updateBounds() throws IOException {
-        unload();
-        int minX = 600, minY = 600, minZ = 600;
-        int maxX = -1000, maxY = -1000, maxZ = -1000;
-        for (int x = 0; x < 500; x++) {
-            for (int z = 0; z < 500; z++) {
-                for (int y = 51; y < 130; y++) {
-                    Location loc = new Location(world, x, y, z);
-                    if (loc.getBlock().getType() != Material.AIR) {
-                        minX = Math.min(minX, x);
-                        minY = Math.min(minY, y);
-                        minZ = Math.min(minZ, z);
+    private final AtomicBoolean saving = new AtomicBoolean(false);
 
-                        maxX = Math.max(maxX, x);
-                        maxY = Math.max(maxY, y);
-                        maxZ = Math.max(maxZ, z);
-                    }
+    /**
+     * Takes block-only snapshots of the room's build area, a few chunks per tick,
+     * so saving never stalls a single tick.
+     *
+     * @param perTick how many chunks to snapshot each tick
+     * @return the snapshots, completed on the main thread once all are taken
+     */
+    private CompletableFuture<List<ChunkSnapshot>> snapshotChunks(int perTick) {
+        CompletableFuture<List<ChunkSnapshot>> done = new CompletableFuture<>();
+        List<ChunkSnapshot> snaps = new ArrayList<>();
+        int total = 32 * 32;
+
+        new BukkitRunnable() {
+            int i = 0;
+
+            @Override
+            public void run() {
+                for (int n = 0; n < perTick && i < total; n++, i++) {
+                    Chunk chunk = world.getChunkAt(i / 32, i % 32);
+                    snaps.add(chunk.getChunkSnapshot(false, false, false));
+                }
+                if (i >= total) {
+                    cancel();
+                    done.complete(snaps);
                 }
             }
-        }
+        }.runTaskTimer(Sponge.plugin, 0L, 1L);
 
-        localBounds.resize(minX,minY,minZ,maxX,maxY,maxZ);
+        return done;
+    }
 
-        CuboidRegion region = new CuboidRegion(BukkitAdapter.adapt(world) , BlockVector3.at(minX,minY,minZ),BlockVector3.at(maxX,maxY,maxZ));
-        BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
-        clipboard.setOrigin(BlockVector3.at(entranceConnector.getCenter().getX(),entranceConnector.getCenter().getY(),entranceConnector.getCenter().getZ()));
-        ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(
-                BukkitAdapter.adapt(world), region, clipboard, region.getMinimumPoint());
+    /**
+     * Scans this room's build world for the extent of placed blocks, updates the
+     * template's local bounds, and exports the room as a schematic file. Chunk
+     * snapshots are spread over ticks; scanning and writing run off the main thread.
+     *
+     * @return completes once the schematic is written and bounds are applied
+     */
+    public CompletableFuture<Void> saveSchematicAsync() {
+        if (entranceConnector == null)
+            return CompletableFuture.failedFuture(new IllegalStateException("Room has no entrance"));
+        if (!saving.compareAndSet(false, true))
+            return CompletableFuture.completedFuture(null); // a save is already running
 
-        Operations.complete(forwardExtentCopy);
+        //remove displays, snapshot the chunks
+        unload();
+        Vector origin = entranceConnector.getCenter();
 
-        File file = Path.of("room_templates/" + name + ".schem").toFile();
+        CompletableFuture<Void> result = new CompletableFuture<>();
 
-        try (ClipboardWriter writer = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(new FileOutputStream(file))) {
-            writer.write(clipboard);
-        }
-        spawnDisplays();
-        hasSchematic = true;
+        //scan, copy, write
+        snapshotChunks(16).thenAccept(snaps -> Bukkit.getScheduler().runTaskAsynchronously(Sponge.plugin, () -> {
+            try {
+                int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
+                int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
+                for (ChunkSnapshot s : snaps) {
+                    for (int x = 0; x < 16; x++) for (int z = 0; z < 16; z++) for (int y = 51; y < 130; y++) {
+                        if (s.getBlockType(x, y, z).isAir()) continue;
+                        int wx = s.getX() * 16 + x, wz = s.getZ() * 16 + z;
+                        minX = Math.min(minX, wx); minY = Math.min(minY, y); minZ = Math.min(minZ, wz);
+                        maxX = Math.max(maxX, wx); maxY = Math.max(maxY, y); maxZ = Math.max(maxZ, wz);
+                    }
+                }
+                if (minX == Integer.MAX_VALUE) throw new IllegalStateException("Room is empty");
+
+                CuboidRegion region = new CuboidRegion(BukkitAdapter.adapt(world),
+                        BlockVector3.at(minX, minY, minZ), BlockVector3.at(maxX, maxY, maxZ));
+                BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
+                clipboard.setOrigin(BlockVector3.at(origin.getX(), origin.getY(), origin.getZ()));
+                Operations.complete(new ForwardExtentCopy(BukkitAdapter.adapt(world), region, clipboard, region.getMinimumPoint()));
+
+                Path target = Path.of("room_templates", name + ".schem");
+                Files.createDirectories(target.getParent());
+                Path tmp = target.resolveSibling(name + ".schem.tmp");
+                try (ClipboardWriter w = BuiltInClipboardFormat.SPONGE_SCHEMATIC.getWriter(Files.newOutputStream(tmp))) {
+                    w.write(clipboard);
+                }
+                Files.move(tmp, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+
+                //apply results
+                int[] b = {minX, minY, minZ, maxX, maxY, maxZ};
+                Bukkit.getScheduler().runTask(Sponge.plugin, () -> {
+                    localBounds.resize(b[0], b[1], b[2], b[3], b[4], b[5]);
+                    hasSchematic = true;
+                    spawnDisplays();
+                    saving.set(false);
+                    result.complete(null);
+                });
+            } catch (Exception e) {
+                Bukkit.getScheduler().runTask(Sponge.plugin, () -> {
+                    spawnDisplays();
+                    saving.set(false);
+                    result.completeExceptionally(e);
+                });
+            }
+        }));
+        return result;
     }
 
     /**
      * Serializes this room template to a JSON file under room_templates/.
+     *
      * @throws IOException if writing the file fails
      */
     public void saveToFile() throws IOException {
@@ -205,12 +269,13 @@ public class RoomTemplate {
     /**
      * Loads a room template from its JSON file, reattaches its SlimeWorld, and
      * rebuilds its runtime (non-persisted) state.
+     *
      * @param roomName the name of the room template to load
      * @return the reconstructed RoomTemplate
-     * @throws IOException if reading the file fails
+     * @throws IOException             if reading the file fails
      * @throws CorruptedWorldException if the associated world data is corrupted
-     * @throws NewerFormatException if the world data format is unsupported
-     * @throws UnknownWorldException if the associated world cannot be found
+     * @throws NewerFormatException    if the world data format is unsupported
+     * @throws UnknownWorldException   if the associated world cannot be found
      */
     public static RoomTemplate fromFile(String roomName) throws IOException, CorruptedWorldException, NewerFormatException, UnknownWorldException {
         Path path = Path.of("room_templates/" + roomName + ".json");
@@ -218,7 +283,7 @@ public class RoomTemplate {
         room.slimeWorld = asp.readWorld(loader, room.name, false, new SlimePropertyMap());
         room.worldInstance = asp.loadWorld(room.slimeWorld, true);
         room.world = room.worldInstance.getBukkitWorld();
-        room.world.setGameRule(GameRules.ADVANCE_TIME,false);
+        room.world.setGameRule(GameRules.ADVANCE_TIME, false);
         room.rebuildBounds();
         FloorRegistry.get(room.floorName).addRoom(room);
         for (Connector c : room.exitConnectors) c.rebuild(room.world);
@@ -231,8 +296,12 @@ public class RoomTemplate {
      * in preparation for saving.
      */
     private void syncBoundsToFields() {
-        minX = localBounds.getMinX(); minY = localBounds.getMinY(); minZ = localBounds.getMinZ();
-        maxX = localBounds.getMaxX(); maxY = localBounds.getMaxY(); maxZ = localBounds.getMaxZ();
+        minX = localBounds.getMinX();
+        minY = localBounds.getMinY();
+        minZ = localBounds.getMinZ();
+        maxX = localBounds.getMaxX();
+        maxY = localBounds.getMaxY();
+        maxZ = localBounds.getMaxZ();
     }
 
     /**
@@ -245,6 +314,7 @@ public class RoomTemplate {
 
     /**
      * Builds a WorldEdit rotation transform for the given yaw rotation.
+     *
      * @param degrees rotation in degrees around the Y axis
      * @return a transform representing that rotation
      */
@@ -255,8 +325,9 @@ public class RoomTemplate {
     /**
      * Rotates a direction vector by the given transform, ignoring any translation
      * component of the transform.
+     *
      * @param transform the transform whose rotation should be applied
-     * @param dir the local-space direction vector to rotate
+     * @param dir       the local-space direction vector to rotate
      * @return the rotated direction vector
      */
     public static Vector3 rotateDirection(Transform transform, Vector3 dir) {
@@ -268,9 +339,10 @@ public class RoomTemplate {
      * Predicts the world-space bounding box this template would occupy if pasted
      * with the given transform and local origin, landing at pasteAt, without
      * touching any blocks.
-     * @param transform the rotation transform to apply
+     *
+     * @param transform   the rotation transform to apply
      * @param localOrigin the local-space anchor point the paste is relative to
-     * @param pasteAt the world-space location the anchor point should land at
+     * @param pasteAt     the world-space location the anchor point should land at
      * @return the predicted world-space bounding box
      */
     public BoundingBox computeWorldBounds(Transform transform, BlockVector3 localOrigin, BlockVector3 pasteAt) {
@@ -292,6 +364,7 @@ public class RoomTemplate {
     /**
      * Computes the rotation (0/90/180/270 degrees) needed to rotate the fixed
      * entrance direction to face the given target direction.
+     *
      * @param targetDirection the direction the entrance should end up facing
      * @return the required rotation in degrees
      */
@@ -307,6 +380,7 @@ public class RoomTemplate {
      * Checks whether the given direction points in the disallowed "backward"
      * world direction (<-1,0,0>), which would cause a room to try to generate
      * back toward where the player came from.
+     *
      * @param direction the direction to test
      * @return true if the direction is (approximately) backward
      */
