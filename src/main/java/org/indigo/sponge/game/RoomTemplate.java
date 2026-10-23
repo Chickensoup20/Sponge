@@ -131,7 +131,7 @@ public class RoomTemplate {
         for (Connector exit : exitConnectors) {
             exit.removeDisplayEntity();
         }
-        entranceConnector.removeDisplayEntity();
+        if (entranceConnector != null) entranceConnector.removeDisplayEntity();
     }
 
     /**
@@ -153,7 +153,75 @@ public class RoomTemplate {
         spawnDisplays();
     }
 
-    private final AtomicBoolean saving = new AtomicBoolean(false);
+    // transient: Gson would otherwise persist these, and a room saved mid-save could never save again
+    private final transient AtomicBoolean saving = new AtomicBoolean(false);
+    private final transient AtomicBoolean savingWorld = new AtomicBoolean(false);
+
+    /**
+     * Saves the room: optionally re-exports the schematic first, then writes the
+     * room's blocks (slime world) and JSON data. Completes on the main thread.
+     *
+     * @param withSchematic whether to also re-export the schematic (skipped if the room has no entrance)
+     * @return completes once everything is written
+     */
+    public CompletableFuture<Void> saveAsync(boolean withSchematic) {
+        if (!withSchematic || entranceConnector == null) return saveWorldAsync();
+        // schematic first so the JSON picks up the freshly scanned bounds
+        return saveSchematicAsync()
+                .exceptionally(e -> {
+                    Sponge.plugin.getLogger().warning("Schematic export failed for room " + name + ": " + e.getMessage());
+                    return null;
+                })
+                .thenCompose(v -> saveWorldAsync());
+    }
+
+    /**
+     * Writes the room's JSON and its slime world. The world copy is taken on the
+     * main thread; writing it to disk happens off the main thread.
+     *
+     * @return completes on the main thread once the world is on disk
+     */
+    public CompletableFuture<Void> saveWorldAsync() {
+        if (!savingWorld.compareAndSet(false, true))
+            return CompletableFuture.completedFuture(null); // a save is already running
+
+        SlimeWorld copy;
+        try {
+            saveToFile();
+            copy = worldInstance.getSerializableCopy();
+        } catch (Exception e) {
+            savingWorld.set(false);
+            return CompletableFuture.failedFuture(e);
+        }
+
+        CompletableFuture<Void> result = new CompletableFuture<>();
+        Bukkit.getScheduler().runTaskAsynchronously(Sponge.plugin, () -> {
+            Exception error = null;
+            try {
+                asp.saveWorld(copy);
+            } catch (Exception e) {
+                error = e;
+            }
+            Exception finalError = error;
+            Bukkit.getScheduler().runTask(Sponge.plugin, () -> {
+                savingWorld.set(false);
+                if (finalError != null) result.completeExceptionally(finalError);
+                else result.complete(null);
+            });
+        });
+        return result;
+    }
+
+    /**
+     * Writes the room's JSON and slime world on the current thread. Only for
+     * shutdown, where async tasks would never get to run.
+     *
+     * @throws IOException if writing either file fails
+     */
+    public void saveBlocking() throws IOException {
+        saveToFile();
+        asp.saveWorld(worldInstance.getSerializableCopy());
+    }
 
     /**
      * Takes block-only snapshots of the room's build area, a few chunks per tick,

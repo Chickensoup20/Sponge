@@ -12,6 +12,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.indigo.sponge.functions.Item;
 import org.indigo.sponge.game.Game;
+import org.indigo.sponge.game.rooms.RoomAutosave;
 import org.indigo.sponge.registries.Games;
 import org.indigo.sponge.registries.Items;
 import org.indigo.sponge.registries.Players;
@@ -42,6 +43,10 @@ public class GameEvents implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
+        SpongePlayer session = Players.find(player);
+        if (session != null && session.getState() == SpongePlayer.State.BUILD && session.getBuildingRoom() != null) {
+            RoomAutosave.saveOnLeave(session.getBuildingRoom(), session);
+        }
         for (Game game : Games.runningGames) {
             game.alivePlayers.remove(player);
         }

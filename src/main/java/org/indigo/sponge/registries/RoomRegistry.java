@@ -3,6 +3,7 @@ package org.indigo.sponge.registries;
 import com.infernalsuite.asp.api.exceptions.CorruptedWorldException;
 import com.infernalsuite.asp.api.exceptions.NewerFormatException;
 import com.infernalsuite.asp.api.exceptions.UnknownWorldException;
+import org.indigo.sponge.Sponge;
 import org.indigo.sponge.game.RoomTemplate;
 
 import java.io.IOException;
@@ -36,14 +37,18 @@ public class RoomRegistry {
         return room;
     }
 
+    /**
+     * Saves every room's JSON and world on the current thread. Used on shutdown;
+     * one room failing doesn't stop the rest from saving.
+     */
     public static void saveRooms() {
         for (RoomTemplate room : instance().rooms.values()) {
             try {
-                room.saveToFile();
-                room.unload();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                room.saveBlocking();
+            } catch (Exception e) {
+                Sponge.plugin.getLogger().severe("Failed to save room " + room.name + ": " + e);
             }
+            room.unload();
         }
     }
 

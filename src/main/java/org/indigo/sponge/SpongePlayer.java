@@ -7,6 +7,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.indigo.sponge.game.RoomTemplate;
 import org.indigo.sponge.game.rooms.Connector;
+import org.indigo.sponge.game.rooms.RoomAutosave;
 
 import java.util.List;
 import java.util.UUID;
@@ -74,6 +75,9 @@ public class SpongePlayer {
     }
 
     public void applyState(State state) {
+        if (currentState == State.BUILD && state != State.BUILD && buildingRoom != null) {
+            RoomAutosave.saveOnLeave(buildingRoom, this);
+        }
         setCurrentState(state);
         applyState();
     }
@@ -87,6 +91,9 @@ public class SpongePlayer {
     }
 
     public void setBuilding(RoomTemplate room) {
+        if (currentState == State.BUILD && buildingRoom != null && buildingRoom != room) {
+            RoomAutosave.saveOnLeave(buildingRoom, this);
+        }
         buildingRoom = room;
         applyState(State.BUILD);
     }

@@ -18,6 +18,7 @@ import org.indigo.sponge.commands.SpongeCommands;
 import org.indigo.sponge.registries.CustomBlocks;
 import org.indigo.sponge.game.*;
 import org.indigo.sponge.game.rooms.BuildEvents;
+import org.indigo.sponge.game.rooms.RoomAutosave;
 import org.indigo.sponge.registries.FloorRegistry;
 import org.indigo.sponge.registries.Players;
 import org.indigo.sponge.registries.RoomRegistry;
@@ -83,6 +84,7 @@ public class Sponge extends JavaPlugin {
         FloorRegistry.register(new Floor("sponge", 1, List.of(RoomTemplate.RoomType.NORMAL, new Branch(List.of(RoomTemplate.RoomType.NORMAL,RoomTemplate.RoomType.BOSS)), RoomTemplate.RoomType.BOSS)));
         RoomRegistry.init(new RoomRegistry());
         RoomRegistry.loadRooms();
+        RoomAutosave.start(this);
     }
 
     @Override
