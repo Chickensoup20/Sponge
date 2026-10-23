@@ -100,22 +100,6 @@ public class Sponge extends JavaPlugin {
         Players.shutdown();
     }
 
-    private static final Gson GSON = new GsonBuilder()
-            .setExclusionStrategies(new ExclusionStrategy() {
-                @Override public boolean shouldSkipClass(Class<?> c) {
-                    String n = c.getName();
-                    return n.startsWith("org.bukkit.craftbukkit")
-                            || n.startsWith("net.minecraft")
-                            || org.bukkit.World.class.isAssignableFrom(c)
-                            || org.bukkit.entity.Entity.class.isAssignableFrom(c)
-                            || org.bukkit.Location.class.isAssignableFrom(c)
-                            || com.infernalsuite.asp.api.world.SlimeWorld.class.isAssignableFrom(c);
-                }
-                @Override public boolean shouldSkipField(FieldAttributes f) { return false; }
-            })
-            .setPrettyPrinting()
-            .create();
-
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
         return new WorldGenerator();
