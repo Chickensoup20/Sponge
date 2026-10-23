@@ -14,6 +14,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.indigo.sponge.commands.SpongeCommands;
 import org.indigo.sponge.registries.CustomBlocks;
 import org.indigo.sponge.game.*;
 import org.indigo.sponge.game.rooms.BuildEvents;
@@ -53,15 +54,7 @@ public class Sponge extends JavaPlugin {
         }
 
         //Initialising commands
-        this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
-            commands.registrar().register(CommandHelper.flyspeedCommand().build(),List.of("fs","flightspeed"));
-            commands.registrar().register(CommandHelper.devCommand());
-            commands.registrar().register(CommandHelper.lobbyCommand());
-            commands.registrar().register(CommandHelper.giveCommand(),List.of("give","get"));
-            commands.registrar().register(CommandHelper.rooms());
-            commands.registrar().register(CommandHelper.testCommand());
-            commands.registrar().register(CommandHelper.blocksCommand());
-        });
+        this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> SpongeCommands.register(commands.registrar()));
 
         // Plugin startup logic
         System.out.println("[Sponge] Plugin Enabled!");

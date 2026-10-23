@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.indigo.sponge.game.RoomTemplate;
 import org.indigo.sponge.game.rooms.Connector;
 
+import java.util.List;
 import java.util.UUID;
 
 public class SpongePlayer {
