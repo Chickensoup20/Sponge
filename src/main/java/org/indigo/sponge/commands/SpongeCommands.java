@@ -1,11 +1,7 @@
 package org.indigo.sponge.commands;
 
 import io.papermc.paper.command.brigadier.Commands;
-import org.indigo.sponge.commands.dev.BlocksCommand;
-import org.indigo.sponge.commands.dev.DevCommand;
-import org.indigo.sponge.commands.dev.FlySpeedCommand;
-import org.indigo.sponge.commands.dev.GiveItemCommand;
-import org.indigo.sponge.commands.dev.TestCommand;
+import org.indigo.sponge.commands.dev.*;
 import org.indigo.sponge.commands.rooms.RoomsCommand;
 
 import java.util.List;
@@ -21,7 +17,8 @@ public final class SpongeCommands {
             new GiveItemCommand(),
             new BlocksCommand(),
             new TestCommand(),
-            new RoomsCommand()
+            new RoomsCommand(),
+            new RunningGamesCommand()
     );
 
     public static void register(Commands registrar) {

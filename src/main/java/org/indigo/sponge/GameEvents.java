@@ -3,10 +3,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -48,7 +45,7 @@ public class GameEvents implements Listener {
             RoomAutosave.saveOnLeave(session.getBuildingRoom(), session);
         }
         for (Game game : Games.runningGames) {
-            game.alivePlayers.remove(player);
+            game.removeAlivePlayer(session);
         }
         Players.remove(player.getUniqueId());
     }

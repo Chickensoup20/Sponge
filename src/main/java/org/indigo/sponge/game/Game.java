@@ -25,13 +25,13 @@ import java.util.*;
 import static org.indigo.sponge.Sponge.*;
 
 public class Game {
-    private List<Player> players = new ArrayList<>();
+    private List<SpongePlayer> players = new ArrayList<>();
     private UUID uuid;
     private SlimeWorld slimeWorld;
     private World world;
     private List<BoundingBox> roomBoxes = new ArrayList<>();
     public List<RoomInstance> instances = new ArrayList<>();
-    public List<Player> alivePlayers;
+    private List<SpongePlayer> alivePlayers = new ArrayList<>();
     public Floor floor;
     private int roomIndex = 0;
     private Branch currentBranch = null;
@@ -39,8 +39,14 @@ public class Game {
     public boolean newBranch = false;
     public boolean canBranch = false;
 
-    public Game(List<Player> players, Floor floor){
-        this.players = players;
+    public Game(List<SpongePlayer> players, Floor floor){
+        for(SpongePlayer player: players){
+            if (player.isInGame()){
+                throw new IllegalStateException(player.getPlayer().getName() + " is in a game");
+            }
+        }
+        this.players.addAll(players);
+
         this.uuid = UUID.randomUUID();
         this.floor = floor;
         this.rooms = floor.rooms;
@@ -54,17 +60,27 @@ public class Game {
         roomBoxes.add(room.boundingBox);
         instances.add(room);
         Games.runningGames.add(this);
-        alivePlayers = players;
+        alivePlayers.addAll(players);
 
         currentBranch = new Branch(floor.floorMap);
         world.setGameRule(GameRules.ADVANCE_TIME,false);
     }
 
     public void start() {
-        for (Player player : players) {
-            Players.get(player).applyState(SpongePlayer.State.INGAME);
+        for (SpongePlayer player : players) {
+            player.applyState(SpongePlayer.State.INGAME);
+            player.setGame(this);
         }
         teleportPlayersToSpawningPoints(instances.getFirst());
+    }
+
+    public void end(){
+
+        for(SpongePlayer player : players){
+            player.applyState(SpongePlayer.State.LOBBY);
+            player.setGame(null);
+        }
+        Games.runningGames.remove(this);
     }
 
     public void teleportPlayersToSpawningPoints(RoomInstance next){
@@ -82,8 +98,8 @@ public class Game {
         }
         if(!spawnLocs.isEmpty()){
             int index = 0;
-            for(Player player : players){
-                player.teleport(spawnLocs.get(index));
+            for(SpongePlayer player : players){
+                player.getPlayer().teleport(spawnLocs.get(index));
                 index++;
                 if(index >= spawnLocs.size()){
                     index = 0;
@@ -96,8 +112,8 @@ public class Game {
         if (exit.isBlocked()) return;
 
         if(roomIndex >= currentBranch.getChildren().size()){
-            for(Player player : players){
-                Players.get(player).applyState(SpongePlayer.State.LOBBY);
+            for(SpongePlayer player : players){
+                player.applyState(SpongePlayer.State.LOBBY);
             }
             return;
         }
@@ -179,5 +195,17 @@ public class Game {
             }
         }
         return null;
+    }
+
+    public void removeAlivePlayer(SpongePlayer player){
+        alivePlayers.remove(player);
+    }
+
+    public int amtAlivePlayers(){
+        return alivePlayers.size();
+    }
+
+    public List<SpongePlayer> getAlivePlayers(){
+        return alivePlayers;
     }
 }

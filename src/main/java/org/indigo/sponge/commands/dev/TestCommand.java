@@ -9,6 +9,7 @@ import org.indigo.sponge.commands.Cmd;
 import org.indigo.sponge.commands.SpongeCommand;
 import org.indigo.sponge.game.Game;
 import org.indigo.sponge.registries.FloorRegistry;
+import org.indigo.sponge.registries.Players;
 
 import java.util.List;
 
@@ -26,6 +27,6 @@ public final class TestCommand implements SpongeCommand {
     }
 
     private void run(CommandContext<CommandSourceStack> ctx, Player player) {
-        new Game(List.of(player), FloorRegistry.get("sponge")).start();
+        new Game(List.of(Players.get(player)), FloorRegistry.get("sponge")).start();
     }
 }

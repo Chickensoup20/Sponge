@@ -51,10 +51,10 @@ public class CancelledEvents implements Listener {
         event.setCancelled(true);
     }
 
-    @EventHandler
-    public void onDamage(EntityDamageEvent event){
-        event.setCancelled(true);
-    }
+//    @EventHandler
+//    public void onDamage(EntityDamageEvent event){
+//        event.setCancelled(true);
+//    }
 
     @EventHandler
     public void NotePlayerEvent(NotePlayEvent event){

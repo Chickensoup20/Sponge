@@ -5,6 +5,7 @@ import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
+import org.indigo.sponge.game.Game;
 import org.indigo.sponge.game.RoomTemplate;
 import org.indigo.sponge.game.rooms.Connector;
 import org.indigo.sponge.game.rooms.RoomAutosave;
@@ -20,6 +21,7 @@ public class SpongePlayer {
     private boolean placingEntrance;
     private boolean placingExit;
     private Connector pendingExit;
+    private Game game;
 
     public enum State {
         LOBBY,
@@ -33,6 +35,7 @@ public class SpongePlayer {
         this.player = player;
         this.currentState = state;
         this.buildingRoom = null;
+        this.game = null;
     }
 
     public void attach(Player player) {
@@ -56,6 +59,13 @@ public class SpongePlayer {
                 player.setGameMode(GameMode.ADVENTURE);
                 buildingRoom = null;
                 clearBuildToolState();
+                player.getInventory().clear();
+                player.setHealth(player.getAttribute(Attribute.MAX_HEALTH).getBaseValue());
+                player.setSaturation(20);
+                player.setFoodLevel(20);
+                player.setFlySpeed(0.1f);
+                World lobby = Bukkit.getWorld("lobby");
+                player.teleport(lobby.getSpawnLocation());
             }
             case BUILD -> {
                 player.setGameMode(GameMode.CREATIVE);
@@ -65,13 +75,7 @@ public class SpongePlayer {
                 return;
             }
         }
-        player.getInventory().clear();
-        player.setHealth(player.getAttribute(Attribute.MAX_HEALTH).getBaseValue());
-        player.setSaturation(20);
-        player.setFoodLevel(20);
-        player.setFlySpeed(0.1f);
-        World lobby = Bukkit.getWorld("lobby");
-        player.teleport(lobby.getSpawnLocation());
+
     }
 
     public void applyState(State state) {
@@ -130,5 +134,24 @@ public class SpongePlayer {
         placingEntrance = false;
         placingExit = false;
         pendingExit = null;
+    }
+
+    public void setGame(Game game){
+        this.game = game;
+    }
+
+    public Game getGame(){
+        if(currentState == State.INGAME){
+            return game;
+        } else {
+            return null;
+        }
+    }
+
+    public boolean isInGame(){
+        if(game != null && currentState == State.INGAME){
+            return true;
+        }
+        return false;
     }
 }
