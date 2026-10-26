@@ -15,12 +15,7 @@ import java.util.List;
 
 public class BuildEvents implements Listener {
 
-    /**
-     * Handles player interactions while in BUILD state: left/right-clicking with
-     * the entrance wand defines a room's entrance connector, and doing the same
-     * with the exit wand defines (or, while sneaking, removes) exit connectors.
-     * @param event the player interact event to handle
-     */
+
     @EventHandler
     public void interactEvent(PlayerInteractEvent event) {
         SpongePlayer session = Players.find(event.getPlayer());

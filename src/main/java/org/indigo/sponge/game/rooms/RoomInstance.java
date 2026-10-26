@@ -35,22 +35,12 @@ public class RoomInstance {
     public List<Connector> exits = new ArrayList<>();
     public Connector entrance;
 
-    /**
-     * Creates an unplaced room instance for the given template. Call {@link #generate}
-     * to actually paste it into the world.
-     * @param roomTemplate the template this instance is based on
-     */
+    
     public RoomInstance(RoomTemplate roomTemplate){
         this.roomTemplate = roomTemplate;
     }
 
-    /**
-     * Pastes this instance's template schematic into the world at the given
-     * location and rotation, then computes its world-space bounding box and
-     * transforms its entrance/exit connectors into world space.
-     * @param pasteLoc the world location to paste the schematic at
-     * @param rotation the yaw rotation (in degrees) to paste with
-     */
+    
     public void generate(Location pasteLoc, int rotation){
         this.pasteLoc = pasteLoc;
 
@@ -104,17 +94,7 @@ public class RoomInstance {
         }
     }
 
-    /**
-     * Searches a pool of candidate room templates for one whose entrance can be
-     * rotated to face the given exit without its resulting bounding box overlapping
-     * any existing room. Pastes and returns the first fit found, or seals the exit
-     * and returns null if nothing fits.
-     * @param exit the exit connector to generate a new room from
-     * @param world the world to paste into
-     * @param candidatePool the room templates to try
-     * @param existingBoxes bounding boxes of rooms already placed, to check against
-     * @return the newly generated room instance, or null if the exit was sealed
-     */
+    
     public static RoomInstance generateFromExit(Connector exit, World world,
                                                 List<RoomTemplate> candidatePool,
                                                 List<BoundingBox> existingBoxes) {
@@ -160,20 +140,12 @@ public class RoomInstance {
         return null;
     }
 
-    /**
-     * Computes the position of relativePoint relative to worldLocation.
-     * @param worldLocation the reference point
-     * @param relativePoint the point to express relative to worldLocation
-     * @return the relative offset vector
-     */
+    
     private Vector getRelativeLocation(Vector worldLocation, Vector relativePoint){
         return relativePoint.subtract(worldLocation);
     }
 
-    /**
-     * Holds a candidate placement found by findPlacement(): which template fits,
-     * at what rotation, pasted where, with its predicted world bounding box.
-     */
+    
     private static class Placement {
         final RoomTemplate template;
         final int rotation;
@@ -186,17 +158,7 @@ public class RoomInstance {
         }
     }
 
-    /**
-     * Searches candidatePool for a template and 90° rotation whose entrance faces
-     * the given exit and whose predicted bounding box doesn't overlap any existing
-     * room instance other than sourceRoom (which is excluded since it's always
-     * meant to touch flush). Performs no world mutation.
-     * @param exit the exit connector to align a new room's entrance to
-     * @param candidatePool the room templates to try
-     * @param existingInstances all room instances currently placed
-     * @param sourceRoom the room the exit belongs to, excluded from collision checks
-     * @return a fitting placement, or null if none was found
-     */
+    
     private static Placement findPlacement(Connector exit, List<RoomTemplate> candidatePool,
                                            List<RoomInstance> existingInstances, RoomInstance sourceRoom) {
         // NOTE: entranceConnector.getDirection() is not reliable here — BuildEvents always
@@ -247,16 +209,7 @@ public class RoomInstance {
         return null;
     }
 
-    /**
-     * Finds a fitting template for the given exit and pastes it. Blocks the exit
-     * and returns null if no candidate fits.
-     * @param exit the exit connector to generate a new room from
-     * @param world the world to paste into
-     * @param candidatePool the room templates to try
-     * @param existingInstances all room instances currently placed
-     * @param sourceRoom the room the exit belongs to, excluded from collision checks
-     * @return the newly generated room instance, or null if the exit was sealed
-     */
+    
     public static RoomInstance generateFromExit(Connector exit, World world,
                                                 List<RoomTemplate> candidatePool,
                                                 List<RoomInstance> existingInstances,
@@ -273,15 +226,7 @@ public class RoomInstance {
         return instance;
     }
 
-    /**
-     * Checks whether any candidate template could be generated from the given exit
-     * without overlapping an existing room, without actually pasting anything.
-     * @param exit the exit connector to test
-     * @param candidatePool the room templates to try
-     * @param existingInstances all room instances currently placed
-     * @param sourceRoom the room the exit belongs to, excluded from collision checks
-     * @return true if at least one fitting placement exists
-     */
+    
     public static boolean canGenerateFrom(Connector exit, List<RoomTemplate> candidatePool,
                                           List<RoomInstance> existingInstances, RoomInstance sourceRoom) {
         Vector dirRaw = exit.getDirection();

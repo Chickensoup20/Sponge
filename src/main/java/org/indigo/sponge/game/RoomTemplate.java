@@ -88,14 +88,6 @@ public class RoomTemplate {
             .setPrettyPrinting()
             .create();
 
-    /**
-     * Creates a new room template: registers it under the given floor, creates a
-     * fresh SlimeWorld for it, and lays down a bedrock floor to build on.
-     *
-     * @param name      unique name identifying this room template
-     * @param floorName name of the floor this room belongs to
-     * @param roomType  difficulty/category of this room
-     */
     public RoomTemplate(String name, String floorName, RoomType roomType) {
         this.roomType = roomType;
         this.name = name;
@@ -118,15 +110,9 @@ public class RoomTemplate {
 
     }
 
-    /**
-     * No-arg constructor used by Gson when deserializing a saved room template.
-     */
     public RoomTemplate() {
     }
 
-    /**
-     * Removes the display entities for this room's entrance and all exits.
-     */
     public void unload() {
         for (Connector exit : exitConnectors) {
             exit.removeDisplayEntity();
@@ -134,20 +120,11 @@ public class RoomTemplate {
         if (entranceConnector != null) entranceConnector.removeDisplayEntity();
     }
 
-    /**
-     * Spawns the display entities for all of this room's exits and its entrance,
-     * if one is set.
-     */
     public void spawnDisplays() {
         for (Connector c : exitConnectors) c.spawnDisplayEntity();
         if (entranceConnector != null) entranceConnector.spawnDisplayEntity();
     }
 
-    /**
-     * Teleports a player into this room's build world and shows its connector displays.
-     *
-     * @param player the player to teleport
-     */
     public void tpToWorld(Player player) {
         player.teleport(new Location(world, 0, 51, 0));
         spawnDisplays();
@@ -157,13 +134,6 @@ public class RoomTemplate {
     private final transient AtomicBoolean saving = new AtomicBoolean(false);
     private final transient AtomicBoolean savingWorld = new AtomicBoolean(false);
 
-    /**
-     * Saves the room: optionally re-exports the schematic first, then writes the
-     * room's blocks (slime world) and JSON data. Completes on the main thread.
-     *
-     * @param withSchematic whether to also re-export the schematic (skipped if the room has no entrance)
-     * @return completes once everything is written
-     */
     public CompletableFuture<Void> saveAsync(boolean withSchematic) {
         if (!withSchematic || entranceConnector == null) return saveWorldAsync();
         // schematic first so the JSON picks up the freshly scanned bounds
@@ -175,12 +145,6 @@ public class RoomTemplate {
                 .thenCompose(v -> saveWorldAsync());
     }
 
-    /**
-     * Writes the room's JSON and its slime world. The world copy is taken on the
-     * main thread; writing it to disk happens off the main thread.
-     *
-     * @return completes on the main thread once the world is on disk
-     */
     public CompletableFuture<Void> saveWorldAsync() {
         if (!savingWorld.compareAndSet(false, true))
             return CompletableFuture.completedFuture(null); // a save is already running
@@ -212,24 +176,11 @@ public class RoomTemplate {
         return result;
     }
 
-    /**
-     * Writes the room's JSON and slime world on the current thread. Only for
-     * shutdown, where async tasks would never get to run.
-     *
-     * @throws IOException if writing either file fails
-     */
     public void saveBlocking() throws IOException {
         saveToFile();
         asp.saveWorld(worldInstance.getSerializableCopy());
     }
 
-    /**
-     * Takes block-only snapshots of the room's build area, a few chunks per tick,
-     * so saving never stalls a single tick.
-     *
-     * @param perTick how many chunks to snapshot each tick
-     * @return the snapshots, completed on the main thread once all are taken
-     */
     private CompletableFuture<List<ChunkSnapshot>> snapshotChunks(int perTick) {
         CompletableFuture<List<ChunkSnapshot>> done = new CompletableFuture<>();
         List<ChunkSnapshot> snaps = new ArrayList<>();
@@ -254,13 +205,6 @@ public class RoomTemplate {
         return done;
     }
 
-    /**
-     * Scans this room's build world for the extent of placed blocks, updates the
-     * template's local bounds, and exports the room as a schematic file. Chunk
-     * snapshots are spread over ticks; scanning and writing run off the main thread.
-     *
-     * @return completes once the schematic is written and bounds are applied
-     */
     public CompletableFuture<Void> saveSchematicAsync() {
         if (entranceConnector == null)
             return CompletableFuture.failedFuture(new IllegalStateException("Room has no entrance"));
@@ -322,11 +266,6 @@ public class RoomTemplate {
         return result;
     }
 
-    /**
-     * Serializes this room template to a JSON file under room_templates/.
-     *
-     * @throws IOException if writing the file fails
-     */
     public void saveToFile() throws IOException {
         syncBoundsToFields();
         Path path = Path.of("room_templates/" + name + ".json");
@@ -334,17 +273,6 @@ public class RoomTemplate {
         Files.writeString(path, GSON.toJson(this));
     }
 
-    /**
-     * Loads a room template from its JSON file, reattaches its SlimeWorld, and
-     * rebuilds its runtime (non-persisted) state.
-     *
-     * @param roomName the name of the room template to load
-     * @return the reconstructed RoomTemplate
-     * @throws IOException             if reading the file fails
-     * @throws CorruptedWorldException if the associated world data is corrupted
-     * @throws NewerFormatException    if the world data format is unsupported
-     * @throws UnknownWorldException   if the associated world cannot be found
-     */
     public static RoomTemplate fromFile(String roomName) throws IOException, CorruptedWorldException, NewerFormatException, UnknownWorldException {
         Path path = Path.of("room_templates/" + roomName + ".json");
         RoomTemplate room = GSON.fromJson(Files.readString(path), RoomTemplate.class);
@@ -359,10 +287,6 @@ public class RoomTemplate {
         return room;
     }
 
-    /**
-     * Copies the current local bounding box into the persisted min/max fields,
-     * in preparation for saving.
-     */
     private void syncBoundsToFields() {
         minX = localBounds.getMinX();
         minY = localBounds.getMinY();
@@ -372,47 +296,21 @@ public class RoomTemplate {
         maxZ = localBounds.getMaxZ();
     }
 
-    /**
-     * Reconstructs the local bounding box from the persisted min/max fields,
-     * after loading.
-     */
     private void rebuildBounds() {
         localBounds = new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    /**
-     * Builds a WorldEdit rotation transform for the given yaw rotation.
-     *
-     * @param degrees rotation in degrees around the Y axis
-     * @return a transform representing that rotation
-     */
+
     public static Transform rotationTransform(int degrees) {
         return new AffineTransform().rotateY(degrees);
     }
 
-    /**
-     * Rotates a direction vector by the given transform, ignoring any translation
-     * component of the transform.
-     *
-     * @param transform the transform whose rotation should be applied
-     * @param dir       the local-space direction vector to rotate
-     * @return the rotated direction vector
-     */
+
     public static Vector3 rotateDirection(Transform transform, Vector3 dir) {
         Vector3 zero = transform.apply(Vector3.ZERO);
         return transform.apply(dir).subtract(zero);
     }
 
-    /**
-     * Predicts the world-space bounding box this template would occupy if pasted
-     * with the given transform and local origin, landing at pasteAt, without
-     * touching any blocks.
-     *
-     * @param transform   the rotation transform to apply
-     * @param localOrigin the local-space anchor point the paste is relative to
-     * @param pasteAt     the world-space location the anchor point should land at
-     * @return the predicted world-space bounding box
-     */
     public BoundingBox computeWorldBounds(Transform transform, BlockVector3 localOrigin, BlockVector3 pasteAt) {
         Vector3 originV = localOrigin.toVector3();
         Vector3 pasteV = pasteAt.toVector3();
@@ -429,13 +327,6 @@ public class RoomTemplate {
         );
     }
 
-    /**
-     * Computes the rotation (0/90/180/270 degrees) needed to rotate the fixed
-     * entrance direction to face the given target direction.
-     *
-     * @param targetDirection the direction the entrance should end up facing
-     * @return the required rotation in degrees
-     */
     public static int rotationToFace(Vector3 targetDirection) {
         double fromAngle = Math.atan2(ENTRANCE_LOCAL_DIRECTION.z(), ENTRANCE_LOCAL_DIRECTION.x());
         double toAngle = Math.atan2(targetDirection.z(), targetDirection.x());
@@ -444,14 +335,6 @@ public class RoomTemplate {
         return (int) Math.round(deltaDeg / 90.0) * 90 % 360;
     }
 
-    /**
-     * Checks whether the given direction points in the disallowed "backward"
-     * world direction (<-1,0,0>), which would cause a room to try to generate
-     * back toward where the player came from.
-     *
-     * @param direction the direction to test
-     * @return true if the direction is (approximately) backward
-     */
     public static boolean isBackwardDirection(Vector3 direction) {
         return direction.normalize().dot(BACKWARD_DIRECTION) > 0.99;
     }

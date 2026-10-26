@@ -27,11 +27,6 @@ public class Floor {
 
 
 
-    /**
-     * Creates a new floor and registers it in the global floor lookup.
-     * @param floorName unique name used to identify and later retrieve this floor
-     * @param floorLevel vertical/ordering level of this floor
-     */
     public Floor(String floorName, int floorLevel, List<RoomNode> floorMap){
         this.floorLevel = floorLevel;
         this.name = floorName;
@@ -41,19 +36,11 @@ public class Floor {
         }
     }
 
-    /**
-     * Adds a room template to this floor's room list.
-     * @param room the room template to add
-     */
     public void addRoom(RoomTemplate room){
         allRooms.add(room);
         rooms.get(room.roomType).add(room);
     }
 
-    /**
-     * Removes a room template from this floor's room list.
-     * @param room the room template to remove
-     */
     public void removeRoom(RoomTemplate room){
         allRooms.remove(room);
     }

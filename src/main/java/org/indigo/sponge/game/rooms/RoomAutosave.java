@@ -11,10 +11,6 @@ import org.indigo.sponge.registries.Players;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Periodically saves every room someone is currently building in, plus helpers
- * for saving when a builder leaves a room.
- */
 public final class RoomAutosave {
     private static final long INTERVAL_TICKS = 20L * 60 * 5; // 5 minutes
 
@@ -22,10 +18,6 @@ public final class RoomAutosave {
         Bukkit.getScheduler().runTaskTimer(plugin, RoomAutosave::saveActiveRooms, INTERVAL_TICKS, INTERVAL_TICKS);
     }
 
-    /**
-     * Saves rooms with a builder in them. Rooms nobody is in haven't changed since
-     * the builder left (which already saved them), so they're skipped.
-     */
     private static void saveActiveRooms() {
         Set<RoomTemplate> active = new HashSet<>();
         for (SpongePlayer session : Players.all()) {
@@ -44,12 +36,6 @@ public final class RoomAutosave {
         }
     }
 
-    /**
-     * Full save (schematic + world + JSON) for a room a builder just left.
-     *
-     * @param room   the room being left
-     * @param leaver the builder leaving, told about the result if still online
-     */
     public static void saveOnLeave(RoomTemplate room, SpongePlayer leaver) {
         room.saveAsync(true).whenComplete((v, err) -> {
             if (err != null) {

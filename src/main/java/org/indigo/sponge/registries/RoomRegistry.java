@@ -37,10 +37,6 @@ public class RoomRegistry {
         return room;
     }
 
-    /**
-     * Saves every room's JSON and world on the current thread. Used on shutdown;
-     * one room failing doesn't stop the rest from saving.
-     */
     public static void saveRooms() {
         for (RoomTemplate room : instance().rooms.values()) {
             try {
