@@ -1,9 +1,5 @@
 package org.indigo.sponge;
 
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.infernalsuite.asp.api.AdvancedSlimePaperAPI;
 import com.infernalsuite.asp.api.loaders.SlimeLoader;
 import com.infernalsuite.asp.loaders.file.FileLoader;
@@ -22,6 +18,7 @@ import org.indigo.sponge.game.rooms.RoomAutosave;
 import org.indigo.sponge.registries.FloorRegistry;
 import org.indigo.sponge.registries.Players;
 import org.indigo.sponge.registries.RoomRegistry;
+import org.indigo.sponge.util.Keys;
 
 import java.io.File;
 import java.io.IOException;
@@ -85,6 +82,8 @@ public class Sponge extends JavaPlugin {
         RoomRegistry.init(new RoomRegistry());
         RoomRegistry.loadRooms();
         RoomAutosave.start(this);
+
+        Keys.init(plugin);
     }
 
     @Override
