@@ -1,0 +1,44 @@
+{
+  "name": "zigzag",
+  "exitConnectors": [
+    {
+      "type": "EXIT",
+      "x1": 34.0,
+      "y1": 54.0,
+      "z1": 20.0,
+      "x2": 34.0,
+      "y2": 61.0,
+      "z2": 26.0,
+      "direction": {
+        "x": 1.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "blocked": false
+    }
+  ],
+  "entranceConnector": {
+    "type": "ENTRANCE",
+    "x1": 10.0,
+    "y1": 53.0,
+    "z1": 20.0,
+    "x2": 10.0,
+    "y2": 60.0,
+    "z2": 26.0,
+    "direction": {
+      "x": 1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "blocked": false
+  },
+  "hasSchematic": true,
+  "minX": 9.0,
+  "minY": 51.0,
+  "minZ": 10.0,
+  "maxX": 34.0,
+  "maxY": 62.0,
+  "maxZ": 35.0,
+  "roomType": "NORMAL",
+  "floorName": "jungle"
+}

@@ -1,0 +1,44 @@
+{
+  "name": "ruin_stairs",
+  "exitConnectors": [
+    {
+      "type": "EXIT",
+      "x1": 41.0,
+      "y1": 60.0,
+      "z1": 16.0,
+      "x2": 41.0,
+      "y2": 67.0,
+      "z2": 22.0,
+      "direction": {
+        "x": 1.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "blocked": false
+    }
+  ],
+  "entranceConnector": {
+    "type": "ENTRANCE",
+    "x1": 11.0,
+    "y1": 52.0,
+    "z1": 16.0,
+    "x2": 11.0,
+    "y2": 59.0,
+    "z2": 22.0,
+    "direction": {
+      "x": 1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "blocked": false
+  },
+  "hasSchematic": true,
+  "minX": 10.0,
+  "minY": 51.0,
+  "minZ": 9.0,
+  "maxX": 41.0,
+  "maxY": 68.0,
+  "maxZ": 29.0,
+  "roomType": "NORMAL",
+  "floorName": "jungle"
+}

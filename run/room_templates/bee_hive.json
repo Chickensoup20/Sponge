@@ -1,0 +1,44 @@
+{
+  "name": "bee_hive",
+  "exitConnectors": [
+    {
+      "type": "EXIT",
+      "x1": 43.0,
+      "y1": 53.0,
+      "z1": 10.0,
+      "x2": 43.0,
+      "y2": 60.0,
+      "z2": 16.0,
+      "direction": {
+        "x": 1.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "blocked": false
+    }
+  ],
+  "entranceConnector": {
+    "type": "ENTRANCE",
+    "x1": 6.0,
+    "y1": 53.0,
+    "z1": 10.0,
+    "x2": 6.0,
+    "y2": 60.0,
+    "z2": 16.0,
+    "direction": {
+      "x": 1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "blocked": false
+  },
+  "hasSchematic": true,
+  "minX": 5.0,
+  "minY": 51.0,
+  "minZ": 5.0,
+  "maxX": 43.0,
+  "maxY": 63.0,
+  "maxZ": 21.0,
+  "roomType": "NORMAL",
+  "floorName": "jungle"
+}

@@ -1,0 +1,44 @@
+{
+  "name": "ruin_garden",
+  "exitConnectors": [
+    {
+      "type": "EXIT",
+      "x1": 51.0,
+      "y1": 55.0,
+      "z1": 23.0,
+      "x2": 51.0,
+      "y2": 62.0,
+      "z2": 29.0,
+      "direction": {
+        "x": 1.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "blocked": false
+    }
+  ],
+  "entranceConnector": {
+    "type": "ENTRANCE",
+    "x1": 11.0,
+    "y1": 55.0,
+    "z1": 23.0,
+    "x2": 11.0,
+    "y2": 62.0,
+    "z2": 29.0,
+    "direction": {
+      "x": 1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "blocked": false
+  },
+  "hasSchematic": true,
+  "minX": 10.0,
+  "minY": 51.0,
+  "minZ": 11.0,
+  "maxX": 51.0,
+  "maxY": 68.0,
+  "maxZ": 41.0,
+  "roomType": "HARD",
+  "floorName": "jungle"
+}

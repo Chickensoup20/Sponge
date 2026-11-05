@@ -1,0 +1,44 @@
+{
+  "name": "tunnel",
+  "exitConnectors": [
+    {
+      "type": "EXIT",
+      "x1": 35.0,
+      "y1": 53.0,
+      "z1": 16.0,
+      "x2": 35.0,
+      "y2": 60.0,
+      "z2": 22.0,
+      "direction": {
+        "x": 1.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "blocked": false
+    }
+  ],
+  "entranceConnector": {
+    "type": "ENTRANCE",
+    "x1": 7.0,
+    "y1": 53.0,
+    "z1": 16.0,
+    "x2": 7.0,
+    "y2": 60.0,
+    "z2": 22.0,
+    "direction": {
+      "x": 1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "blocked": false
+  },
+  "hasSchematic": true,
+  "minX": 6.0,
+  "minY": 51.0,
+  "minZ": 7.0,
+  "maxX": 35.0,
+  "maxY": 62.0,
+  "maxZ": 30.0,
+  "roomType": "HARD",
+  "floorName": "jungle"
+}

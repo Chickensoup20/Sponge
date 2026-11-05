@@ -1,0 +1,59 @@
+{
+  "name": "test2",
+  "exitConnectors": [
+    {
+      "type": "EXIT",
+      "x1": 18.0,
+      "y1": 51.0,
+      "z1": 6.0,
+      "x2": 14.0,
+      "y2": 55.0,
+      "z2": 6.0,
+      "direction": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": -1.0
+      },
+      "blocked": false
+    },
+    {
+      "type": "EXIT",
+      "x1": 14.0,
+      "y1": 51.0,
+      "z1": 18.0,
+      "x2": 18.0,
+      "y2": 55.0,
+      "z2": 18.0,
+      "direction": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 1.0
+      },
+      "blocked": false
+    }
+  ],
+  "entranceConnector": {
+    "type": "ENTRANCE",
+    "x1": 10.0,
+    "y1": 51.0,
+    "z1": 10.0,
+    "x2": 10.0,
+    "y2": 55.0,
+    "z2": 14.0,
+    "direction": {
+      "x": 1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "blocked": false
+  },
+  "hasSchematic": true,
+  "minX": 10.0,
+  "minY": 51.0,
+  "minZ": 6.0,
+  "maxX": 18.0,
+  "maxY": 55.0,
+  "maxZ": 18.0,
+  "roomType": "NORMAL",
+  "floorName": "sponge"
+}

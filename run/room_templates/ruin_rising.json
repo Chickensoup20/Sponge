@@ -1,0 +1,44 @@
+{
+  "name": "ruin_rising",
+  "exitConnectors": [
+    {
+      "type": "EXIT",
+      "x1": 29.0,
+      "y1": 64.0,
+      "z1": 16.0,
+      "x2": 29.0,
+      "y2": 71.0,
+      "z2": 22.0,
+      "direction": {
+        "x": 1.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "blocked": false
+    }
+  ],
+  "entranceConnector": {
+    "type": "ENTRANCE",
+    "x1": 9.0,
+    "y1": 52.0,
+    "z1": 16.0,
+    "x2": 9.0,
+    "y2": 59.0,
+    "z2": 22.0,
+    "direction": {
+      "x": 1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "blocked": false
+  },
+  "hasSchematic": true,
+  "minX": 8.0,
+  "minY": 51.0,
+  "minZ": 8.0,
+  "maxX": 30.0,
+  "maxY": 72.0,
+  "maxZ": 30.0,
+  "roomType": "NORMAL",
+  "floorName": "jungle"
+}

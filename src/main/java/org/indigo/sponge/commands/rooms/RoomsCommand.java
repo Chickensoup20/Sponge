@@ -25,7 +25,8 @@ public final class RoomsCommand implements SpongeCommand {
                 .then(Commands.literal("create")
                         .then(Commands.argument("name", StringArgumentType.word())
                                 .then(Commands.argument("type", new EnumArgument<>(RoomTemplate.RoomType.class))
-                                        .executes(Cmd.player(this::create)))))
+                                        .then(Commands.argument("floor", StringArgumentType.word())
+                                            .executes(Cmd.player(this::create))))))
                 .then(Commands.literal("goto")
                         .then(Commands.argument("room", new RoomArgument())
                                 .executes(Cmd.player(this::goTo))))
@@ -51,7 +52,7 @@ public final class RoomsCommand implements SpongeCommand {
     private void create(CommandContext<CommandSourceStack> ctx, Player player) {
         String name = StringArgumentType.getString(ctx, "name");
         RoomTemplate.RoomType type = ctx.getArgument("type", RoomTemplate.RoomType.class);
-        RoomTemplate room = new RoomTemplate(name, "sponge", type);
+        RoomTemplate room = new RoomTemplate(name, StringArgumentType.getString(ctx, "floor"), type);
         room.tpToWorld(player);
         Players.get(player).setBuilding(room);
     }

@@ -79,6 +79,7 @@ public class Sponge extends JavaPlugin {
         }
         FloorRegistry.init(new FloorRegistry());
         FloorRegistry.register(new Floor("sponge", 1, List.of(RoomTemplate.RoomType.NORMAL, new Branch(List.of(RoomTemplate.RoomType.NORMAL,RoomTemplate.RoomType.BOSS)), RoomTemplate.RoomType.BOSS)));
+        FloorRegistry.register(new Floor("jungle", 1, List.of(RoomTemplate.RoomType.NORMAL, new Branch(List.of(RoomTemplate.RoomType.NORMAL,RoomTemplate.RoomType.BOSS)), RoomTemplate.RoomType.BOSS)));
         RoomRegistry.init(new RoomRegistry());
         RoomRegistry.loadRooms();
         RoomAutosave.start(this);

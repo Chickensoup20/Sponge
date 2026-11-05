@@ -1,0 +1,44 @@
+{
+  "name": "ruin_section_2",
+  "exitConnectors": [
+    {
+      "type": "EXIT",
+      "x1": 38.0,
+      "y1": 57.0,
+      "z1": 13.0,
+      "x2": 38.0,
+      "y2": 64.0,
+      "z2": 19.0,
+      "direction": {
+        "x": 1.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "blocked": false
+    }
+  ],
+  "entranceConnector": {
+    "type": "ENTRANCE",
+    "x1": 8.0,
+    "y1": 57.0,
+    "z1": 13.0,
+    "x2": 8.0,
+    "y2": 64.0,
+    "z2": 19.0,
+    "direction": {
+      "x": 1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "blocked": false
+  },
+  "hasSchematic": true,
+  "minX": 7.0,
+  "minY": 51.0,
+  "minZ": 8.0,
+  "maxX": 38.0,
+  "maxY": 67.0,
+  "maxZ": 24.0,
+  "roomType": "NORMAL",
+  "floorName": "jungle"
+}

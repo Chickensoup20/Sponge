@@ -1,0 +1,44 @@
+{
+  "name": "branch",
+  "exitConnectors": [
+    {
+      "type": "EXIT",
+      "x1": 25.0,
+      "y1": 51.0,
+      "z1": 20.0,
+      "x2": 25.0,
+      "y2": 55.0,
+      "z2": 16.0,
+      "direction": {
+        "x": 1.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "blocked": false
+    }
+  ],
+  "entranceConnector": {
+    "type": "ENTRANCE",
+    "x1": 10.0,
+    "y1": 51.0,
+    "z1": 16.0,
+    "x2": 10.0,
+    "y2": 55.0,
+    "z2": 20.0,
+    "direction": {
+      "x": 1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "blocked": false
+  },
+  "hasSchematic": true,
+  "minX": 10.0,
+  "minY": 51.0,
+  "minZ": 14.0,
+  "maxX": 26.0,
+  "maxY": 55.0,
+  "maxZ": 24.0,
+  "roomType": "BRANCH",
+  "floorName": "sponge"
+}
